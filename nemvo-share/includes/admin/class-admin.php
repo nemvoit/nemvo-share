@@ -1,6 +1,6 @@
 <?php
 /**
- * wp-admin: menus, assets and form handlers.
+ * Admin screens: menus, assets and form handlers.
  *
  * @package NemvoShare
  */
@@ -47,6 +47,7 @@ class Admin {
 		add_action( 'admin_notices', array( __CLASS__, 'notices' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( NEMVO_SHARE_FILE ), array( __CLASS__, 'action_links' ) );
 		add_filter( 'display_post_states', array( __CLASS__, 'post_states' ), 10, 2 );
+		add_filter( 'removable_query_args', array( __CLASS__, 'removable_query_args' ) );
 		Settings_Page::init();
 	}
 
@@ -120,21 +121,21 @@ class Admin {
 	/**
 	 * Link for a row action (disable, enable, delete, new link).
 	 *
-	 * @param string $do Action.
-	 * @param int    $id Share ID.
+	 * @param string $action Action.
+	 * @param int    $id     Share ID.
 	 * @return string
 	 */
-	public static function action_url( $do, $id ) {
+	public static function action_url( $action, $id ) {
 		return wp_nonce_url(
 			add_query_arg(
 				array(
 					'action' => 'nemvo_share_action',
-					'do'     => $do,
+					'do'     => $action,
 					'share'  => (int) $id,
 				),
 				admin_url( 'admin-post.php' )
 			),
-			'nemvo_share_' . $do . '_' . (int) $id
+			'nemvo_share_' . $action . '_' . (int) $id
 		);
 	}
 
@@ -176,7 +177,6 @@ class Admin {
 			) . ';',
 			'before'
 		);
-
 	}
 
 	/**
@@ -236,10 +236,22 @@ class Admin {
 	 * @return string[]
 	 */
 	public static function post_states( $states, $post ) {
-		if ( (int) $post->ID === (int) Settings::get( 'page_id' ) ) {
+		if ( (int) Settings::get( 'page_id' ) === (int) $post->ID ) {
 			$states['nemvo_share'] = __( 'Share page', 'nemvo-share' );
 		}
 		return $states;
+	}
+
+	/**
+	 * Removes the notice arguments from the address bar once the notice is shown.
+	 *
+	 * @param string[] $args Query arguments.
+	 * @return string[]
+	 */
+	public static function removable_query_args( $args ) {
+		$args[] = 'nemvo_share_msg';
+		$args[] = 'nemvo_share_count';
+		return $args;
 	}
 
 	/**
@@ -251,8 +263,8 @@ class Admin {
 			return;
 		}
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- display only.
-		$message = isset( $_GET['nvs_msg'] ) ? sanitize_key( wp_unslash( $_GET['nvs_msg'] ) ) : '';
-		$count   = isset( $_GET['nvs_count'] ) ? absint( $_GET['nvs_count'] ) : 0;
+		$message = isset( $_GET['nemvo_share_msg'] ) ? sanitize_key( wp_unslash( $_GET['nemvo_share_msg'] ) ) : '';
+		$count   = isset( $_GET['nemvo_share_count'] ) ? absint( $_GET['nemvo_share_count'] ) : 0;
 		// phpcs:enable
 		$messages = array(
 			'updated'     => array( 'success', __( 'Share updated.', 'nemvo-share' ) ),
@@ -304,7 +316,7 @@ class Admin {
 		$id    = isset( $_POST['share_id'] ) ? absint( $_POST['share_id'] ) : 0;
 		$share = $id ? Shares::get( $id ) : null;
 		if ( $id && ! $share ) {
-			wp_safe_redirect( self::url( self::SLUG, array( 'nvs_msg' => 'notfound' ) ) );
+			wp_safe_redirect( self::url( self::SLUG, array( 'nemvo_share_msg' => 'notfound' ) ) );
 			exit;
 		}
 		$back = $id ? self::edit_url( $id ) : self::url( self::SLUG_NEW );
@@ -336,7 +348,7 @@ class Admin {
 			$local = str_replace( 'T', ' ', $local );
 			$utc   = preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/', $local ) ? get_gmt_from_date( $local ) : '';
 			if ( ! $utc || \NemvoShare\Plugin::ts( $utc ) <= time() ) {
-				wp_safe_redirect( add_query_arg( 'nvs_msg', 'past', $back ) );
+				wp_safe_redirect( add_query_arg( 'nemvo_share_msg', 'past', $back ) );
 				exit;
 			}
 			$expires = $utc;
@@ -359,17 +371,17 @@ class Admin {
 			}
 		}
 		if ( '' === trim( $note ) && ! $upload_ids && ! $classic && ! $kept_files ) {
-			wp_safe_redirect( add_query_arg( 'nvs_msg', 'empty', $back ) );
+			wp_safe_redirect( add_query_arg( 'nemvo_share_msg', 'empty', $back ) );
 			exit;
 		}
 
 		$data = array(
-			'title'    => $title,
-			'note'     => $note,
-			'password' => $password,
-			'burn'     => ! empty( $_POST['burn'] ),
+			'title'       => $title,
+			'note'        => $note,
+			'password'    => $password,
+			'burn'        => ! empty( $_POST['burn'] ),
 			'auto_delete' => ! empty( $_POST['auto_delete'] ),
-			'notify'   => ! empty( $_POST['notify'] ),
+			'notify'      => ! empty( $_POST['notify'] ),
 		);
 		if ( false !== $expires ) {
 			$data['expires_at'] = $expires;
@@ -390,7 +402,7 @@ class Admin {
 		} else {
 			$id = Shares::create( $data );
 			if ( ! $id ) {
-				wp_safe_redirect( add_query_arg( 'nvs_msg', 'failed', $back ) );
+				wp_safe_redirect( add_query_arg( 'nemvo_share_msg', 'failed', $back ) );
 				exit;
 			}
 		}
@@ -403,7 +415,7 @@ class Admin {
 			$failed = ! Shares::add_file_from_path( $id, $file['tmp_name'], $file['name'], $file['type'] ) || $failed;
 		}
 
-		$args = array( 'nvs_msg' => $failed ? 'files' : ( $share ? 'updated' : 'created' ) );
+		$args = array( 'nemvo_share_msg' => $failed ? 'files' : ( $share ? 'updated' : 'created' ) );
 		if ( ! $share ) {
 			$args['created'] = 1;
 		}
@@ -464,13 +476,13 @@ class Admin {
 
 		$share = Shares::get( $id );
 		if ( ! $share ) {
-			wp_safe_redirect( self::url( self::SLUG, array( 'nvs_msg' => 'notfound' ) ) );
+			wp_safe_redirect( self::url( self::SLUG, array( 'nemvo_share_msg' => 'notfound' ) ) );
 			exit;
 		}
 		switch ( $do ) {
 			case 'delete':
 				Shares::delete( $id );
-				wp_safe_redirect( self::url( self::SLUG, array( 'nvs_msg' => 'deleted' ) ) );
+				wp_safe_redirect( self::url( self::SLUG, array( 'nemvo_share_msg' => 'deleted' ) ) );
 				exit;
 			case 'disable':
 				Shares::set_status( $id, 'disabled' );
@@ -495,7 +507,7 @@ class Admin {
 				$msg = '';
 		}
 		$back = isset( $_GET['from'] ) && 'list' === $_GET['from'] ? self::url() : self::edit_url( $id );
-		wp_safe_redirect( add_query_arg( 'nvs_msg', $msg, $back ) );
+		wp_safe_redirect( add_query_arg( 'nemvo_share_msg', $msg, $back ) );
 		exit;
 	}
 
@@ -528,8 +540,8 @@ class Admin {
 			self::url(
 				self::SLUG,
 				array(
-					'nvs_msg'   => $msg,
-					'nvs_count' => $count,
+					'nemvo_share_msg'   => $msg,
+					'nemvo_share_count' => $count,
 				)
 			)
 		);
@@ -543,7 +555,7 @@ class Admin {
 		self::guard();
 		check_admin_referer( 'nemvo_share_probe' );
 		Storage::probe( true );
-		wp_safe_redirect( self::url( self::SLUG_SETTINGS, array( 'nvs_msg' => 'probed' ) ) . '#nvs-storage' );
+		wp_safe_redirect( self::url( self::SLUG_SETTINGS, array( 'nemvo_share_msg' => 'probed' ) ) . '#nvs-storage' );
 		exit;
 	}
 
@@ -555,7 +567,7 @@ class Admin {
 		check_admin_referer( 'nemvo_share_create_page' );
 		Settings::update( array( 'page_id' => 0 ) );
 		Frontend::ensure_page();
-		wp_safe_redirect( self::url( self::SLUG_SETTINGS, array( 'nvs_msg' => 'page' ) ) );
+		wp_safe_redirect( self::url( self::SLUG_SETTINGS, array( 'nemvo_share_msg' => 'page' ) ) );
 		exit;
 	}
 }

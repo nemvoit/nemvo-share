@@ -11,7 +11,8 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Hourly clean-up: ends expired shares and finished burn windows (removing contents
- * where the share says so), deletes abandoned uploads and old records.
+ * where the share says so), removes IP hashes from old password attempts, and deletes
+ * abandoned uploads and old records.
  *
  * Expiry and burn after reading are also enforced on every request, so a late cron run
  * never makes a share available for longer. Cron only makes the clean-up happen when
@@ -52,6 +53,7 @@ class Cron {
 	 */
 	public static function run() {
 		Shares::sweep();
+		Access::forget_visitors();
 		Uploads::cleanup();
 		Storage::sweep_orphans();
 		Shares::delete_old_records();

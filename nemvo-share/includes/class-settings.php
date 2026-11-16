@@ -34,7 +34,7 @@ class Settings {
 			'default_access'      => 'password',
 			'default_expiry'      => '7d',
 			'default_burn'        => 0,
-			'default_auto_delete'       => 1,
+			'default_auto_delete' => 1,
 			'default_notify'      => 0,
 			'burn_window'         => 60,
 			'max_file_mb'         => 2048,

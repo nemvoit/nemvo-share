@@ -143,11 +143,14 @@ class Frontend {
 	}
 
 	/**
-	 * Flushes rewrite rules after the share page changed, or when ours are missing.
+	 * Flushes rewrite rules after the share page changed (the flag set by page_changed()
+	 * and the settings). Once a day it also checks that our rules are there, for changes
+	 * the flag can't see, such as a parent page getting a new slug.
 	 */
 	public static function maybe_flush() {
 		$flush = (bool) get_option( 'nemvo_share_flush_rewrite' );
-		if ( ! $flush && get_option( 'permalink_structure' ) && self::page_id() ) {
+		if ( ! $flush && get_option( 'permalink_structure' ) && self::page_id() && ! get_transient( 'nemvo_share_rewrite_checked' ) ) {
+			set_transient( 'nemvo_share_rewrite_checked', 1, DAY_IN_SECONDS );
 			$rules = get_option( 'rewrite_rules' );
 			$key   = '^' . preg_quote( self::page_uri(), '#' ) . '/([A-Za-z0-9]{16,64})/?$';
 			$flush = is_array( $rules ) && ! isset( $rules[ $key ] );
@@ -166,7 +169,7 @@ class Frontend {
 	 * @param \WP_Post $before  Post before the update.
 	 */
 	public static function page_changed( $post_id, $after, $before ) {
-		if ( (int) $post_id === (int) Settings::get( 'page_id' ) && ( $after->post_name !== $before->post_name || $after->post_parent !== $before->post_parent || $after->post_status !== $before->post_status ) ) {
+		if ( (int) Settings::get( 'page_id' ) === (int) $post_id && ( $after->post_name !== $before->post_name || $after->post_parent !== $before->post_parent || $after->post_status !== $before->post_status ) ) {
 			update_option( 'nemvo_share_flush_rewrite', 1, true );
 		}
 	}
@@ -240,9 +243,9 @@ class Frontend {
 		return $url ? add_query_arg( self::PREVIEW, wp_create_nonce( 'nemvo_share_preview_' . $share->id ), $url ) : null;
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Request handling                                                   */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Request handling
+	 */
 
 	/**
 	 * Whether this request is for the share page.
@@ -391,6 +394,11 @@ class Frontend {
 	private static function unlock( $share ) {
 		$locked  = __( 'Too many wrong passwords. Please wait 15 minutes and try again.', 'nemvo-share' );
 		$attempt = Access::begin( $share );
+		if ( Access::BUSY === $attempt ) {
+			status_header( 429 );
+			header( 'Retry-After: ' . Access::SHARE_PACE );
+			return __( 'Too many attempts right now. Please wait a few seconds and try again.', 'nemvo-share' );
+		}
 		if ( ! $attempt ) {
 			Shares::log( $share->id, 'locked' );
 			status_header( 429 );
@@ -529,21 +537,21 @@ class Frontend {
 	 * @param int    $status HTTP status.
 	 */
 	private static function ended( $state, $status ) {
-		$titles      = array(
+		$titles     = array(
 			'missing'  => __( 'Share not found', 'nemvo-share' ),
 			'expired'  => __( 'This share has expired', 'nemvo-share' ),
 			'burned'   => __( 'This share is gone', 'nemvo-share' ),
 			'claimed'  => __( 'This share has already been opened', 'nemvo-share' ),
 			'disabled' => __( 'This share is not available', 'nemvo-share' ),
 		);
-		$messages    = array(
+		$messages   = array(
 			'missing'  => __( 'This link does not lead to a share. Check that you copied the whole link, or ask the sender for a new one.', 'nemvo-share' ),
 			'expired'  => __( 'The time for opening this share has run out. Ask the sender to share it again if you still need it.', 'nemvo-share' ),
 			'burned'   => __( 'It could only be opened once and has been destroyed after reading. Ask the sender to share it again if you still need it.', 'nemvo-share' ),
 			'claimed'  => __( 'It could only be opened once, and that has happened. If it was not you, let the sender know.', 'nemvo-share' ),
 			'disabled' => __( 'The sender has switched this share off.', 'nemvo-share' ),
 		);
-		self::$view  = array(
+		self::$view = array(
 			'state'   => 'ended',
 			'reason'  => $state,
 			'title'   => $titles[ $state ],
@@ -566,9 +574,16 @@ class Frontend {
 		foreach ( $files as $file ) {
 			$bytes += (int) $file->size;
 		}
+		if ( 'password' === $state ) {
+			// The title is part of what the password protects: until it is entered, the
+			// page heading, the browser title and everything else show a neutral heading.
+			$title = __( 'Protected share', 'nemvo-share' );
+		} else {
+			$title = '' !== $share->title ? $share->title : __( 'Shared with you', 'nemvo-share' );
+		}
 		return array(
 			'state'   => $state,
-			'title'   => '' !== $share->title ? $share->title : __( 'Shared with you', 'nemvo-share' ),
+			'title'   => $title,
 			'share'   => $share,
 			'preview' => (bool) $preview,
 			'action'  => Shares::url( $share ),
@@ -666,9 +681,9 @@ class Frontend {
 		return $facts;
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Output                                                             */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Output
+	 */
 
 	/**
 	 * Styles and scripts, on the share page only.
@@ -746,7 +761,7 @@ class Frontend {
 	 * @return string
 	 */
 	public static function filter_title( $title, $post_id = 0 ) {
-		if ( null === self::$view || is_admin() || (int) $post_id !== self::page_id() || ! in_the_loop() ) {
+		if ( null === self::$view || is_admin() || self::page_id() !== (int) $post_id || ! in_the_loop() ) {
 			return $title;
 		}
 		self::$title_shown = true;
@@ -774,8 +789,8 @@ class Frontend {
 	 */
 	public static function robots( $robots ) {
 		if ( self::on_share_page() ) {
-			$robots['noindex']  = true;
-			$robots['nofollow'] = true;
+			$robots['noindex']   = true;
+			$robots['nofollow']  = true;
 			$robots['noarchive'] = true;
 			unset( $robots['max-image-preview'] );
 		}

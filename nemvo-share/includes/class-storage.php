@@ -106,7 +106,9 @@ class Storage {
 	 * @return string
 	 */
 	public static function path( $stored ) {
-		return self::files_dir() . '/' . preg_replace( '/[^a-z0-9.]/', '', (string) $stored );
+		// Only names made by new_name(); anything else points at a file that never exists.
+		$stored = (string) $stored;
+		return self::files_dir() . '/' . ( preg_match( '/^[a-z0-9]{32}\.bin$/', $stored ) ? $stored : 'invalid.bin' );
 	}
 
 	/**
@@ -153,9 +155,9 @@ class Storage {
 		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COALESCE(SUM(size), 0) FROM %i', Install::table( 'files' ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Encryption                                                         */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Encryption
+	 */
 
 	/**
 	 * A new key for one file.
@@ -262,8 +264,15 @@ class Storage {
 				break;
 			}
 			// fread() on a plain file returns the whole block, but don't rely on it.
-			while ( strlen( $plain ) < min( self::BLOCK, $size - $done ) && ! feof( $in ) ) {
-				$plain .= fread( $in, (int) ( min( self::BLOCK, $size - $done ) - strlen( $plain ) ) );
+			$want = (int) min( self::BLOCK, $size - $done );
+			$have = strlen( $plain );
+			while ( $have < $want && ! feof( $in ) ) {
+				$more = fread( $in, $want - $have );
+				if ( false === $more || '' === $more ) {
+					break;
+				}
+				$plain .= $more;
+				$have  += strlen( $more );
 			}
 			fwrite( $out, self::encrypt_block( $plain, $index, $size, $key, $prefix ) );
 			$done += strlen( $plain );
@@ -300,12 +309,14 @@ class Storage {
 			$plain_len = (int) min( self::BLOCK, $size - $index * self::BLOCK );
 			$want      = $plain_len + self::TAG;
 			$cipher    = '';
-			while ( strlen( $cipher ) < $want && ! feof( $handle ) ) {
-				$chunk = fread( $handle, $want - strlen( $cipher ) );
+			$have      = 0;
+			while ( $have < $want && ! feof( $handle ) ) {
+				$chunk = fread( $handle, $want - $have );
 				if ( false === $chunk || '' === $chunk ) {
 					break;
 				}
 				$cipher .= $chunk;
+				$have   += strlen( $chunk );
 			}
 			$plain = self::decrypt_block( $cipher, $index, $size, $key, $prefix );
 			if ( false === $plain ) {
@@ -328,9 +339,9 @@ class Storage {
 		return true;
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Protection check                                                   */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Protection check
+	 */
 
 	/**
 	 * URL of the storage folder, when it is inside the web root.
@@ -375,12 +386,14 @@ class Storage {
 			$secret = Crypto::token();
 			$file   = self::files_dir() . '/probe.txt';
 			file_put_contents( $file, $secret );
+			// A request to this site itself. Like core's own loopback checks, it skips TLS
+			// verification for local certificates unless https_local_ssl_verify says otherwise.
 			$response = wp_remote_get(
 				$url . '/files/probe.txt',
 				array(
 					'timeout'     => 10,
 					'redirection' => 0,
-					'sslverify'   => false,
+					'sslverify'   => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core filter.
 				)
 			);
 			wp_delete_file( $file );

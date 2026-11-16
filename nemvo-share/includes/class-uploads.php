@@ -31,7 +31,13 @@ class Uploads {
 	}
 
 	/**
-	 * REST routes.
+	 * REST routes, for signed-in users who may manage shares.
+	 *
+	 * Every endpoint is left out of the public /wp-json index. Their arguments have no
+	 * "required" flag, schema type or validate_callback, because WordPress checks those
+	 * before permission_callback: anonymous requests must get 401 whatever they send.
+	 * The sanitize callbacks below can't fail, and the callbacks validate the values
+	 * after the permission check.
 	 */
 	public static function routes() {
 		$permission = array( Plugin::class, 'can_manage' );
@@ -39,22 +45,24 @@ class Uploads {
 			self::NS,
 			'/uploads',
 			array(
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => array( __CLASS__, 'start' ),
-				'permission_callback' => $permission,
-				'args'                => array(
-					'name' => array(
-						'type'     => 'string',
-						'required' => true,
-					),
-					'size' => array(
-						'type'     => 'integer',
-						'required' => true,
-						'minimum'  => 0,
-					),
-					'type' => array(
-						'type'    => 'string',
-						'default' => '',
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( __CLASS__, 'start' ),
+					'permission_callback' => $permission,
+					'show_in_index'       => false,
+					'args'                => array(
+						'name' => array(
+							'description'       => 'File name.',
+							'sanitize_callback' => array( __CLASS__, 'sanitize_name' ),
+						),
+						'size' => array(
+							'description'       => 'File size in bytes.',
+							'sanitize_callback' => array( __CLASS__, 'sanitize_number' ),
+						),
+						'type' => array(
+							'description'       => 'MIME type reported by the browser.',
+							'sanitize_callback' => array( __CLASS__, 'sanitize_type' ),
+						),
 					),
 				),
 			)
@@ -67,11 +75,11 @@ class Uploads {
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( __CLASS__, 'chunk' ),
 					'permission_callback' => $permission,
+					'show_in_index'       => false,
 					'args'                => array(
 						'index' => array(
-							'type'     => 'integer',
-							'required' => true,
-							'minimum'  => 0,
+							'description'       => 'Number of the chunk, from 0.',
+							'sanitize_callback' => array( __CLASS__, 'sanitize_number' ),
 						),
 					),
 				),
@@ -79,7 +87,59 @@ class Uploads {
 					'methods'             => \WP_REST_Server::DELETABLE,
 					'callback'            => array( __CLASS__, 'cancel' ),
 					'permission_callback' => $permission,
+					'show_in_index'       => false,
 				),
+			)
+		);
+	}
+
+	/**
+	 * REST argument: a file name ('' when it isn't text).
+	 *
+	 * @param mixed $value Submitted value.
+	 * @return string
+	 */
+	public static function sanitize_name( $value ) {
+		return is_scalar( $value ) && '' !== trim( (string) $value ) ? Shares::clean_name( (string) $value ) : '';
+	}
+
+	/**
+	 * REST argument: a whole number of 0 or more (-1 when it isn't one).
+	 *
+	 * @param mixed $value Submitted value.
+	 * @return int
+	 */
+	public static function sanitize_number( $value ) {
+		if ( is_int( $value ) ) {
+			return $value >= 0 ? $value : -1;
+		}
+		return ( is_string( $value ) && preg_match( '/^\d{1,18}$/', $value ) ) ? (int) $value : -1;
+	}
+
+	/**
+	 * REST argument: a MIME type ('' when it isn't one).
+	 *
+	 * @param mixed $value Submitted value.
+	 * @return string
+	 */
+	public static function sanitize_type( $value ) {
+		return is_scalar( $value ) ? substr( sanitize_mime_type( (string) $value ), 0, 150 ) : '';
+	}
+
+	/**
+	 * Error for a missing or invalid REST argument.
+	 *
+	 * @param string $name Argument name.
+	 * @return \WP_Error
+	 */
+	private static function invalid_param( $name ) {
+		return new \WP_Error(
+			'rest_invalid_param',
+			/* translators: %s: parameter name. */
+			sprintf( __( 'Invalid parameter: %s', 'nemvo-share' ), $name ),
+			array(
+				'status' => 400,
+				'params' => array( $name ),
 			)
 		);
 	}
@@ -140,8 +200,20 @@ class Uploads {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public static function start( \WP_REST_Request $request ) {
-		$size = (int) $request['size'];
-		$max  = Settings::max_file_bytes();
+		$name = (string) $request['name'];
+		$size = null === $request['size'] ? -1 : (int) $request['size'];
+		$type = (string) $request['type'];
+		if ( '' === $name ) {
+			return self::invalid_param( 'name' );
+		}
+		if ( $size < 0 ) {
+			return self::invalid_param( 'size' );
+		}
+		$allowed = Shares::allow_file( $name, $size, $type );
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+		$max = Settings::max_file_bytes();
 		if ( $max > 0 && $size > $max ) {
 			/* translators: %s: size such as "2 GB". */
 			return new \WP_Error( 'nemvo_share_too_large', sprintf( __( 'This file is larger than the limit of %s.', 'nemvo-share' ), size_format( $max ) ), array( 'status' => 413 ) );
@@ -154,13 +226,13 @@ class Uploads {
 			return new \WP_Error( 'nemvo_share_disk_full', __( 'There is not enough free disk space on the server for this file.', 'nemvo-share' ), array( 'status' => 507 ) );
 		}
 
-		$id    = bin2hex( random_bytes( 16 ) );
-		$key   = Storage::new_key();
-		$state = array(
+		$id             = bin2hex( random_bytes( 16 ) );
+		$key            = Storage::new_key();
+		$state          = array(
 			'user'     => get_current_user_id(),
-			'name'     => Shares::clean_name( $request['name'] ),
+			'name'     => $name,
 			'size'     => $size,
-			'type'     => (string) $request['type'],
+			'type'     => $type,
 			'chunk'    => self::chunk_size(),
 			'received' => 0,
 			'key_enc'  => $key[2],
@@ -189,7 +261,7 @@ class Uploads {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public static function chunk( \WP_REST_Request $request ) {
-		$id                 = (string) $request['id'];
+		$id                  = (string) $request['id'];
 		list( $json, $part ) = self::paths( $id );
 		if ( ! is_file( $json ) ) {
 			return new \WP_Error( 'nemvo_share_no_upload', __( 'This upload was not found. Please try again.', 'nemvo-share' ), array( 'status' => 404 ) );
@@ -218,10 +290,13 @@ class Uploads {
 	 */
 	private static function write_chunk( \WP_REST_Request $request, $id, $lock, $part ) {
 		$state = json_decode( (string) stream_get_contents( $lock, -1, 0 ), true );
-		if ( ! is_array( $state ) || (int) $state['user'] !== get_current_user_id() ) {
+		if ( ! is_array( $state ) || get_current_user_id() !== (int) $state['user'] ) {
 			return new \WP_Error( 'nemvo_share_no_upload', __( 'This upload was not found. Please try again.', 'nemvo-share' ), array( 'status' => 404 ) );
 		}
-		$index  = (int) $request['index'];
+		$index = null === $request['index'] ? -1 : (int) $request['index'];
+		if ( $index < 0 ) {
+			return self::invalid_param( 'index' );
+		}
 		$chunk  = (int) $state['chunk'];
 		$size   = (int) $state['size'];
 		$offset = $index * $chunk;
@@ -300,7 +375,7 @@ class Uploads {
 	 */
 	public static function cancel( \WP_REST_Request $request ) {
 		$state = self::state( $request['id'] );
-		if ( $state && (int) $state['user'] === get_current_user_id() ) {
+		if ( $state && get_current_user_id() === (int) $state['user'] ) {
 			self::discard( $request['id'] );
 		}
 		return rest_ensure_response( array( 'deleted' => true ) );

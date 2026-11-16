@@ -105,11 +105,19 @@ try {
 	await visitor.setViewport({ width: 1280, height: 900 });
 	await visitor.goto(link);
 	ok(await visitor.$('#nvs-password'), 'visitor is asked for the password');
+	const title = 'Design hand-off for Acme';
+	const titleHidden = async (when) => {
+		const html = await visitor.content();
+		const heading = await visitor.$$eval('h1, h2', (els) => els.map((e) => e.textContent.trim()).join(' | '));
+		ok(!html.includes(title) && (await visitor.title()).startsWith('Protected share') && heading.includes('Protected share'), `the title is hidden ${when} (heading: ${heading}; tab: ${await visitor.title()})`);
+	};
+	await titleHidden('before the password');
 	await shot(visitor, 'visitor-password');
 
 	await visitor.type('#nvs-password', 'wrong-password');
 	await Promise.all([visitor.waitForNavigation(), visitor.click('.nvs-form button[type="submit"]')]);
 	ok(await visitor.$('.nvs-error'), 'a wrong password shows an error');
+	await titleHidden('after a wrong password');
 	await shot(visitor, 'visitor-wrong-password');
 
 	await visitor.type('#nvs-password', password);
@@ -118,13 +126,19 @@ try {
 	ok(note.includes('Vt7k-Wq2m'), 'the note is shown after the right password');
 	const names = await visitor.$$eval('.nvs-file-name', (els) => els.map((e) => e.textContent));
 	ok(names.length === 2 && names.includes('Design files – final.zip'), `files are listed (${names.join(', ')})`);
-	ok((await visitor.title()).startsWith('Design hand-off for Acme'), 'the browser tab shows the share title');
+	ok((await visitor.title()).startsWith(title), 'the browser tab shows the share title after the password');
+	ok((await visitor.$$eval('h1, h2', (els) => els.map((e) => e.textContent).join(' '))).includes(title), 'the page heading shows the share title after the password');
 	await shot(visitor, 'visitor-open');
 
 	// Download the big file through the page's own link and compare the size.
 	const href = await visitor.$$eval('.nvs-download', (as) => as.map((a) => a.href));
 	const size = await visitor.evaluate(async (url) => (await (await fetch(url)).arrayBuffer()).byteLength, href[1]);
 	ok(size === statSync(big).size, `download is complete (${size} bytes)`);
+
+	// The same download link without the cookie: 403 with the password form, still without the title.
+	const locked = await fetch(href[1], { redirect: 'manual' });
+	const lockedHtml = await locked.text();
+	ok(locked.status === 403 && lockedHtml.includes('nemvo_share_password') && !lockedHtml.includes(title), `a download without the password gets the form, not the title (${locked.status})`);
 
 	await visitor.setViewport({ width: 390, height: 844, isMobile: true });
 	await visitor.reload();

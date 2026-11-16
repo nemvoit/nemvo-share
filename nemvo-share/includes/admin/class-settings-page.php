@@ -28,6 +28,17 @@ class Settings_Page {
 	public static function init() {
 		add_action( 'admin_init', array( __CLASS__, 'register' ) );
 		add_action( 'update_option_' . Settings::OPTION, array( Settings::class, 'flush' ) );
+		add_filter( 'option_page_capability_' . self::GROUP, array( __CLASS__, 'capability' ) );
+	}
+
+	/**
+	 * Lets options.php save the settings with the plugin's capability (filterable through
+	 * nemvo_share_capability) instead of always requiring manage_options.
+	 *
+	 * @return string
+	 */
+	public static function capability() {
+		return \NemvoShare\Plugin::capability();
 	}
 
 	/**
@@ -81,12 +92,12 @@ class Settings_Page {
 								<?php
 								wp_dropdown_pages(
 									array(
-										'name'              => esc_attr( self::name( 'page_id' ) ),
-										'id'                => 'nvs-page',
-										'selected'          => (int) $s['page_id'],
-										'show_option_none'  => esc_html__( '— Select —', 'nemvo-share' ),
+										'name'             => esc_attr( self::name( 'page_id' ) ),
+										'id'               => 'nvs-page',
+										'selected'         => (int) $s['page_id'],
+										'show_option_none' => esc_html__( '— Select —', 'nemvo-share' ),
 										'option_none_value' => '0',
-										'post_status'       => array( 'publish' ),
+										'post_status'      => array( 'publish' ),
 									)
 								);
 								?>

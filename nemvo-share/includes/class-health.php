@@ -70,10 +70,13 @@ class Health {
 	/**
 	 * Is the storage folder closed to direct web requests?
 	 *
+	 * Uses the probe result from the last day (Settings > Check again probes at once), so
+	 * Site Health makes at most one request to the site itself per day.
+	 *
 	 * @return array
 	 */
 	public static function test_storage() {
-		$probe = Storage::probe( true );
+		$probe = Storage::probe();
 		if ( 'protected' === $probe['status'] || 'outside' === $probe['status'] ) {
 			return self::result(
 				'nemvo_share_storage',
@@ -151,7 +154,7 @@ class Health {
 	 * @return array
 	 */
 	public static function debug_information( $info ) {
-		$free                 = Storage::free_space();
+		$free                = Storage::free_space();
 		$info['nemvo-share'] = array(
 			'label'  => __( 'Nemvo Share', 'nemvo-share' ),
 			'fields' => array(

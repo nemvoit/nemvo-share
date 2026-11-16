@@ -85,11 +85,11 @@ class CLI {
 
 		$id = Shares::create(
 			array(
-				'title'      => isset( $assoc_args['title'] ) ? sanitize_text_field( $assoc_args['title'] ) : '',
-				'note'       => $note,
-				'password'   => $password,
-				'expires_at' => $expires,
-				'burn'       => ! empty( $assoc_args['burn'] ),
+				'title'       => isset( $assoc_args['title'] ) ? sanitize_text_field( $assoc_args['title'] ) : '',
+				'note'        => $note,
+				'password'    => $password,
+				'expires_at'  => $expires,
+				'burn'        => ! empty( $assoc_args['burn'] ),
 				'auto_delete' => empty( $assoc_args['keep'] ),
 			)
 		);

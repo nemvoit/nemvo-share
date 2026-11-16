@@ -2,18 +2,30 @@
 <ruleset name="Nemvo Share">
 	<description>WordPress Coding Standards for Nemvo Share.</description>
 	<file>./nemvo-share</file>
+	<exclude-pattern>*/assets/vendor/*</exclude-pattern>
 	<arg name="extensions" value="php"/>
 	<config name="testVersion" value="7.4-"/>
-	<config name="minimum_supported_wp_version" value="6.2"/>
+	<config name="minimum_supported_wp_version" value="6.3"/>
 	<rule ref="WordPress"/>
+	<rule ref="PHPCompatibilityWP"/>
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="nemvo-share"/>
+			<property name="text_domain" type="array">
+				<element value="nemvo-share"/>
+			</property>
 		</properties>
 	</rule>
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
-			<property name="prefixes" type="array" value="nemvo_share,NemvoShare,NEMVO_SHARE"/>
+			<property name="prefixes" type="array">
+				<element value="nemvo_share"/>
+				<element value="NemvoShare"/>
+				<element value="NEMVO_SHARE"/>
+			</property>
 		</properties>
+	</rule>
+	<!-- block.json names this file; WordPress's build tools use the same name. -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>*/blocks/share/index.asset.php</exclude-pattern>
 	</rule>
 </ruleset>

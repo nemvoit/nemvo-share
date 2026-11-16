@@ -32,10 +32,14 @@ class Install {
 
 	/**
 	 * Deactivation: stop cron and remove the rewrite rules. Data stays.
+	 *
+	 * Flushing here would rebuild the rules with ours still in them (they were added on
+	 * init in this request), so the stored rules are deleted instead and WordPress builds
+	 * them again, without this plugin, on the next request.
 	 */
 	public static function deactivate() {
 		Cron::unschedule();
-		flush_rewrite_rules( false );
+		delete_option( 'rewrite_rules' );
 	}
 
 	/**

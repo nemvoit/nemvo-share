@@ -22,6 +22,8 @@ class Access {
 	const ATTEMPTS      = 5;
 	const LOCK_MINUTES  = 15;
 	const SHARE_LIMIT   = 30;
+	const SHARE_PACE    = 3;
+	const BUSY          = -1;
 	const COOKIE_PREFIX = 'nemvo_share_';
 
 	/**
@@ -151,16 +153,19 @@ class Access {
 		return Crypto::random_string( 32, Crypto::TOKEN_ALPHABET );
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Password attempts                                                  */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Password attempts
+	 */
 
 	/*
 	 * Attempts are rows in the share's activity log (event password_try, then
 	 * password_failed when wrong), keyed by a salted hash of the visitor's IP address.
 	 * Each attempt is inserted before it is checked and counted afterwards, so parallel
 	 * requests can't slip past the limit. Too many wrong passwords from all visitors
-	 * together only slow attempts down, so nobody can lock the real recipient out.
+	 * together only slow attempts down (one every few seconds per share, others get 429),
+	 * so nobody can lock the real recipient out. The IP hash is removed from these rows
+	 * once they are older than the lock window (forget_visitors()), so it is kept for
+	 * 15 minutes and no longer than the next hourly clean-up after that.
 	 *
 	 * phpcs:disable WordPress.DB.DirectDatabaseQuery -- the plugin's own table; counts must not be cached.
 	 */
@@ -223,11 +228,13 @@ class Access {
 	 * Starts an attempt: records it, then checks it is within the limit.
 	 *
 	 * @param object $share Share row.
-	 * @return int Attempt ID, or 0 when attempts are paused for this visitor.
+	 * @return int Attempt ID; 0 when attempts are paused for this visitor; BUSY when the
+	 *             share gets many wrong passwords and another attempt came in just now.
 	 */
 	public static function begin( $share ) {
 		global $wpdb;
 		$table = Install::table( 'log' );
+		self::forget_visitors( (int) $share->id );
 		$wpdb->insert(
 			$table,
 			array(
@@ -242,12 +249,34 @@ class Access {
 			$wpdb->delete( $table, array( 'id' => $id ) );
 			return 0;
 		}
-		// Many wrong passwords for this share from everyone together: slow down, don't lock out.
+		// Many wrong passwords for this share from everyone together: allow one attempt every
+		// few seconds and answer the rest with 429, so nobody locks the real recipient out.
 		$recent = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE share_id = %d AND event = %s AND created_at > %s', $table, $share->id, 'password_failed', Plugin::now( -HOUR_IN_SECONDS ) ) );
 		if ( $recent >= self::SHARE_LIMIT ) {
-			sleep( 2 );
+			$just_now = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE share_id = %d AND event IN (%s, %s) AND id <> %d AND created_at >= %s', $table, $share->id, 'password_try', 'password_failed', $id, Plugin::now( -self::SHARE_PACE ) ) );
+			if ( $just_now > 0 ) {
+				$wpdb->delete( $table, array( 'id' => $id ) );
+				return self::BUSY;
+			}
 		}
 		return $id;
+	}
+
+	/**
+	 * Removes the IP hash from password attempts older than the lock window. The rows
+	 * stay (without it) for the share's activity log and the per-share limit.
+	 *
+	 * @param int $share_id Only this share, or 0 for all shares.
+	 */
+	public static function forget_visitors( $share_id = 0 ) {
+		global $wpdb;
+		$table  = Install::table( 'log' );
+		$cutoff = Plugin::now( -self::LOCK_MINUTES * MINUTE_IN_SECONDS );
+		if ( $share_id ) {
+			$wpdb->query( $wpdb->prepare( "UPDATE %i SET detail = '' WHERE share_id = %d AND event IN (%s, %s) AND detail <> '' AND created_at <= %s", $table, $share_id, 'password_try', 'password_failed', $cutoff ) );
+		} else {
+			$wpdb->query( $wpdb->prepare( "UPDATE %i SET detail = '' WHERE event IN (%s, %s) AND detail <> '' AND created_at <= %s", $table, 'password_try', 'password_failed', $cutoff ) );
+		}
 	}
 
 	/**

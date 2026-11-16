@@ -129,7 +129,7 @@ class Editor {
 						<div class="nvs-card">
 							<label class="nvs-field-label" for="nvs-title"><?php esc_html_e( 'Title', 'nemvo-share' ); ?></label>
 							<input type="text" id="nvs-title" name="title" class="nvs-title-input" maxlength="200" value="<?php echo esc_attr( $share ? $share->title : '' ); ?>" placeholder="<?php esc_attr_e( 'For example: Signed contract for Acme', 'nemvo-share' ); ?>" <?php disabled( ! $editable ); ?>>
-							<p class="description"><?php esc_html_e( 'Shown to anyone with the link, also before the password is entered. Leave out anything secret.', 'nemvo-share' ); ?></p>
+							<p class="description"><?php esc_html_e( 'Shown as the heading of the share page. With a password, recipients see it only after entering the password; without one, anyone with the link sees it.', 'nemvo-share' ); ?></p>
 						</div>
 
 						<div class="nvs-card">
@@ -405,7 +405,8 @@ class Editor {
 						<a class="button" href="<?php echo esc_url( Frontend::preview_url( $share ) ); ?>" target="_blank" rel="noopener"><span class="dashicons dashicons-visibility" aria-hidden="true"></span><?php esc_html_e( 'Preview', 'nemvo-share' ); ?></a>
 						<?php
 						$mail_body = $url;
-						$subject   = '' !== $share->title ? $share->title : get_bloginfo( 'name' );
+						// With a password the title stays hidden until it is entered, so it isn't put in the subject either.
+						$subject = ( '' !== $share->title && '' === $share->password_hash ) ? $share->title : get_bloginfo( 'name' );
 						?>
 						<a class="button" href="<?php echo esc_url( 'mailto:?subject=' . rawurlencode( $subject ) . '&body=' . rawurlencode( $mail_body ) ); ?>"><span class="dashicons dashicons-email" aria-hidden="true"></span><?php esc_html_e( 'Email link', 'nemvo-share' ); ?></a>
 						<a class="button-link" href="<?php echo esc_url( Admin::action_url( 'disable', $share->id ) ); ?>"><?php esc_html_e( 'Switch off', 'nemvo-share' ); ?></a>

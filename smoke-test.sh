@@ -3,8 +3,9 @@
 # wp-admin screens and the share page load without PHP errors, a share with a password and
 # a file can be unlocked and downloaded intact (also in ranges), stored files are encrypted
 # and refused by the web server, burn after reading destroys the share, an upload goes
-# through the chunked REST API, uninstall cleans up, and Plugin Check reports no errors.
-# Also lints on PHP 7.4.
+# through the chunked REST API (and refuses anonymous callers with 401 before checking
+# parameters, without listing its routes in the REST index), uninstall cleans up, and
+# Plugin Check reports no errors or warnings. Also lints on PHP 7.4.
 # Usage: ./smoke-test.sh dist/nemvo-share-x.y.z.zip
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -84,12 +85,14 @@ check "site health" "$url/wp-admin/site-health.php" "$jar"
 visitor="$work/visitor"
 page=$(curl -s -c "$visitor" -b "$visitor" -D "$work/headers" "$link")
 expect "password form shown, note hidden" "$(grep -q 'nemvo_share_password' <<<"$page" && ! grep -q 'Smoke &lt;note&gt;' <<<"$page" && echo 1)"
+expect "title hidden before the password" "$(! grep -q 'Smoke share' <<<"$page" && grep -q 'Protected share' <<<"$page" && echo 1)"
 expect "share page is not cached or indexed" "$(grep -qi '^cache-control: no-store' "$work/headers" && grep -qi '^x-robots-tag: noindex' "$work/headers" && grep -qi '^referrer-policy: no-referrer' "$work/headers" && echo 1)"
 nonce=$(grep -o 'name="nemvo_share_nonce" value="[^"]*"' <<<"$page" | sed 's/.*value="//;s/"$//')
 status=$(curl -s -o /dev/null -w '%{http_code}' -c "$visitor" -b "$visitor" -d "nemvo_share_action=unlock&nemvo_share_nonce=$nonce" --data-urlencode "nemvo_share_password=$password" "$link")
 expect "right password redirects ($status)" "$([ "$status" = 303 ] && echo 1)"
 page=$(curl -s -b "$visitor" "$link")
 expect "note shown and escaped" "$(grep -q 'Smoke &lt;note&gt;' <<<"$page" && echo 1)"
+expect "title shown after the password" "$(grep -q 'Smoke share' <<<"$page" && echo 1)"
 download=$(grep -o 'href="[^"]*/download/[0-9]*/"' <<<"$page" | head -1 | sed 's/href="//;s/"$//')
 curl -s -b "$visitor" -o "$work/got.bin" "$download"
 want=$(dc sha256sum /tmp/smoke.bin | cut -d' ' -f1)
@@ -98,7 +101,7 @@ expect "download matches the original" "$([ "$want" = "$got" ] && echo 1)"
 range=$(curl -s -b "$visitor" -H 'Range: bytes=262140-262150' -o /dev/null -w '%{http_code} %{size_download}' "$download")
 expect "range request ($range)" "$([ "$range" = '206 11' ] && echo 1)"
 status=$(curl -s -o "$work/nopw" -w '%{http_code}' "$download")
-expect "download without the password refused ($status)" "$([ "$status" = 403 ] && grep -q 'nemvo_share_password' "$work/nopw" && echo 1)"
+expect "download without the password refused ($status)" "$([ "$status" = 403 ] && grep -q 'nemvo_share_password' "$work/nopw" && ! grep -q 'Smoke share' "$work/nopw" && echo 1)"
 
 stored=$(dc bash -c 'ls /var/www/html/wp-content/uploads/nemvo-share-*/files/*.bin | head -1')
 expect "stored file is encrypted" "$(dc cmp -s "$stored" /tmp/smoke.bin && echo 0 || echo 1)"
@@ -122,14 +125,22 @@ start=$(curl -s -b "$jar" -H "X-WP-Nonce: $rest_nonce" -H 'Content-Type: applica
 upload_id=$(sed -n 's/.*"id":"\([a-f0-9]*\)".*/\1/p' <<<"$start")
 chunk=$(curl -s -b "$jar" -H "X-WP-Nonce: $rest_nonce" -F index=0 -F "chunk=@$work/up.bin" "$url/wp-json/nemvo-share/v1/uploads/$upload_id")
 expect "upload accepted: $chunk" "$(grep -q '"complete":true' <<<"$chunk" && echo 1)"
-status=$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' --data '{"name":"x","size":1}' "$url/wp-json/nemvo-share/v1/uploads")
-expect "uploads refused without login ($status)" "$([ "$status" = 401 ] && echo 1)"
+anon=""
+for req in 'POST /uploads {"name":"x","size":1}' 'POST /uploads {}' 'POST /uploads {"size":"abc"}' "POST /uploads/$upload_id {\"index\":0}" "POST /uploads/$upload_id {}" "DELETE /uploads/$upload_id {}" 'POST /uploads/0123456789abcdef0123456789abcdef {"index":"x"}'; do
+	read -r method route body <<<"$req"
+	status=$(curl -s -o /dev/null -w '%{http_code}' -X "$method" -H 'Content-Type: application/json' --data "$body" "$url/wp-json/nemvo-share/v1$route")
+	anon="$anon $method$route=$status"
+	[ "$status" = 401 ] || anon="$anon(!)"
+done
+expect "anonymous REST requests get 401, with or without parameters:$anon" "$(grep -q '(!)' <<<"$anon" || echo 1)"
+index=$(curl -s "$url/wp-json/")
+expect "upload routes not in the REST index" "$(grep -q 'nemvo-share\\/v1\\/uploads' <<<"$index" || echo 1)"
 
-echo "== Plugin Check (errors only)"
+echo "== Plugin Check"
 wp plugin install plugin-check --activate >/dev/null 2>&1
-pcp=$(wp plugin check nemvo-share --ignore-warnings --format=csv 2>&1 || true)
+pcp=$(wp plugin check nemvo-share --format=csv 2>&1 || true)
 if grep -q 'No errors found' <<<"$pcp"; then
-	echo "ok   plugin check"
+	echo "ok   plugin check (no errors or warnings)"
 else
 	echo "$pcp"; echo "FAIL plugin check"; fail=1
 fi

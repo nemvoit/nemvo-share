@@ -137,7 +137,7 @@ class Shares {
 			$row['has_note'] = '' !== trim( (string) $data['note'] ) ? 1 : 0;
 		}
 		if ( array_key_exists( 'password', $data ) && null !== $data['password'] ) {
-			$password            = (string) $data['password'];
+			$password             = (string) $data['password'];
 			$row['password_hash'] = '' !== $password ? wp_hash_password( $password ) : '';
 			$row['password_enc']  = Crypto::encrypt( $password, 'password' );
 		}
@@ -234,8 +234,11 @@ class Shares {
 			return false;
 		}
 		$plain = (int) filesize( $path );
-		$max   = Settings::max_file_bytes();
-		$free  = Storage::free_space();
+		if ( is_wp_error( self::allow_file( self::clean_name( $name ), $plain, (string) $mime ) ) ) {
+			return false;
+		}
+		$max  = Settings::max_file_bytes();
+		$free = Storage::free_space();
 		if ( ( $max > 0 && $plain > $max ) || ( null !== $free && Storage::stored_size( $plain ) + 50 * MB_IN_BYTES > $free ) ) {
 			return false;
 		}
@@ -256,6 +259,43 @@ class Shares {
 				'key_enc' => $key_enc,
 			)
 		);
+	}
+
+	/**
+	 * Whether a file may be added to a share.
+	 *
+	 * Any file type is allowed by default: files are encrypted on disk under random names
+	 * without an extension, never executed or shown inline, and only sent as downloads
+	 * (application/octet-stream with nosniff and a sandboxing Content-Security-Policy).
+	 * Sites that want to restrict types can use the nemvo_share_allow_file filter.
+	 *
+	 * @param string $name File name.
+	 * @param int    $size Size in bytes.
+	 * @param string $type MIME type reported by the browser.
+	 * @return true|\WP_Error
+	 */
+	public static function allow_file( $name, $size, $type ) {
+		/**
+		 * Filters whether a file may be added to a share (editor uploads, uploads without
+		 * JavaScript and WP-CLI).
+		 *
+		 * @param true|\WP_Error|false $allowed True to allow; false or a WP_Error to refuse.
+		 * @param string               $name    File name.
+		 * @param int                  $size    Size in bytes.
+		 * @param string               $type    MIME type reported by the browser, may be empty.
+		 */
+		$allowed = apply_filters( 'nemvo_share_allow_file', true, (string) $name, (int) $size, (string) $type );
+		if ( true === $allowed ) {
+			return true;
+		}
+		if ( is_wp_error( $allowed ) ) {
+			$data = $allowed->get_error_data();
+			if ( ! is_array( $data ) || ! isset( $data['status'] ) ) {
+				$allowed->add_data( array_merge( is_array( $data ) ? $data : array(), array( 'status' => 415 ) ) );
+			}
+			return $allowed;
+		}
+		return new \WP_Error( 'nemvo_share_file_type', __( 'This type of file can not be shared on this site.', 'nemvo-share' ), array( 'status' => 415 ) );
 	}
 
 	/**
@@ -320,9 +360,9 @@ class Shares {
 		return '' === $name ? 'file' : $name;
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Secrets                                                            */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Secrets
+	 */
 
 	/**
 	 * The link token of a share.
@@ -370,9 +410,9 @@ class Shares {
 		return Crypto::decrypt( $share->note_enc, 'note' );
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Life cycle                                                         */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Life cycle
+	 */
 
 	/**
 	 * Applies expiry and the burn window, and returns the up-to-date share.
@@ -567,9 +607,9 @@ class Shares {
 		wp_mail( $user->user_email, $subject, implode( "\n", $lines ) );
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Activity log                                                       */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Activity log
+	 */
 
 	/**
 	 * Records an event.
@@ -609,9 +649,9 @@ class Shares {
 		return $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE share_id = %d ORDER BY id DESC LIMIT %d', Install::table( 'log' ), $share_id, $limit ) );
 	}
 
-	/* ------------------------------------------------------------------ */
-	/* Lists                                                              */
-	/* ------------------------------------------------------------------ */
+	/*
+	 * Lists
+	 */
 
 	/**
 	 * Ends every share whose time is up. Runs from cron and before admin lists.
