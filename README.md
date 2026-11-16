@@ -37,7 +37,7 @@ WordPress 6.3 or later, PHP 7.4 or later. The PHP sodium extension is used when 
 
 ## Install
 
-Download `nemvo-share-x.y.z.zip` from [Releases](https://github.com/fpoller/nemvo-share/releases) and upload it under **Plugins › Add New › Upload Plugin**. Activating it creates a **Share** page; links open under `/share/…`. Then go to **Shares › Add New Share**.
+Download `nemvo-share-x.y.z.zip` from [Releases](https://github.com/nemvoit/nemvo-share/releases) and upload it under **Plugins › Add New › Upload Plugin**. Activating it creates a **Share** page; links open under `/share/…`. Then go to **Shares › Add New Share**.
 
 Recommended: open **Shares › Settings** and copy the `define( 'NEMVO_SHARE_KEY', '…' );` line into wp-config.php.
 

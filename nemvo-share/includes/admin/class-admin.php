@@ -210,7 +210,7 @@ class Admin {
 				'content' => '<p>' . esc_html__( 'Files are encrypted on disk with a key per file, stored under random names in a folder the web server refuses to serve, and only handed out through the share page. Notes, links and passwords are encrypted in the database. Wrong passwords are limited to 5 per 15 minutes per visitor.', 'nemvo-share' ) . '</p>',
 			)
 		);
-		$screen->set_help_sidebar( '<p><strong>' . esc_html__( 'More', 'nemvo-share' ) . '</strong></p><p><a href="https://github.com/fpoller/nemvo-share">' . esc_html__( 'Documentation on GitHub', 'nemvo-share' ) . '</a></p>' );
+		$screen->set_help_sidebar( '<p><strong>' . esc_html__( 'More', 'nemvo-share' ) . '</strong></p><p><a href="https://github.com/nemvoit/nemvo-share">' . esc_html__( 'Documentation on GitHub', 'nemvo-share' ) . '</a></p>' );
 	}
 
 	/**

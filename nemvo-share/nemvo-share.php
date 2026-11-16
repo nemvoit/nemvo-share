@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Nemvo Share
- * Plugin URI:        https://github.com/fpoller/nemvo-share
+ * Plugin URI:        https://github.com/nemvoit/nemvo-share
  * Description:       Share notes and files through secret links, with optional passwords, expiry and burn after reading. Files are encrypted on disk and never reachable directly.
  * Version:           1.0.1
  * Requires at least: 6.3
