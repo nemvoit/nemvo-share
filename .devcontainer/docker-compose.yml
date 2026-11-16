@@ -1,0 +1,85 @@
+# Development stack for Nemvo Share.
+#
+#   WordPress   http://localhost:8070  (admin / admin)
+#   Mailpit     http://localhost:8075  (catches "share opened" notifications and other mail)
+#
+# The plugin folder is mounted live, so edits take effect without a build.
+# PHP keeps its default upload limits (2 MB per request) on purpose: uploads
+# are sent in chunks, and the dev site shows that bigger files still work.
+#
+# Ports can be changed with WP_PORT and MAILPIT_PORT.
+
+name: nemvo-share
+
+x-wordpress-env: &wp-env
+  WORDPRESS_DB_HOST: db
+  WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_DB_USER: wordpress
+  WORDPRESS_DB_PASSWORD: wordpress
+  WORDPRESS_DEBUG: "1"
+  WORDPRESS_CONFIG_EXTRA: |
+    define( 'WP_ENVIRONMENT_TYPE', 'local' );
+    define( 'WP_DEBUG_LOG', true );
+    define( 'WP_DEBUG_DISPLAY', false );
+  NEMVO_DEV_MAILPIT: "1"
+  WP_PORT: "${WP_PORT:-8070}"
+  WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
+
+x-wordpress-volumes: &wp-volumes
+  - wordpress:/var/www/html
+  - ../nemvo-share:/var/www/html/wp-content/plugins/nemvo-share
+  - ./mu-plugins:/var/www/html/wp-content/mu-plugins
+  - ..:/workspace:cached
+
+services:
+  wordpress:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${WP_PORT:-8070}:80"
+    environment: *wp-env
+    volumes:
+      - wordpress:/var/www/html
+      - ../nemvo-share:/var/www/html/wp-content/plugins/nemvo-share
+      - ./mu-plugins:/var/www/html/wp-content/mu-plugins
+      - ..:/workspace:cached
+      - ./apache-dev-port.conf:/etc/apache2/sites-enabled/001-dev-port.conf:ro
+
+  # One-off WP-CLI commands: docker compose -f .devcontainer/docker-compose.yml run --rm cli wp <command>
+  cli:
+    image: wordpress:cli-php8.3
+    profiles: ["cli"]
+    user: "33:33"
+    depends_on:
+      - wordpress
+    environment: *wp-env
+    volumes: *wp-volumes
+
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_PORT:-8075}:8025"
+
+volumes:
+  wordpress:
+  db:

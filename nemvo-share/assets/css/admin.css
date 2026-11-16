@@ -1,0 +1,748 @@
+/* Nemvo Share – admin screens. Uses the wp-admin palette so it fits every admin colour scheme. */
+
+.nvs-admin {
+	--nvs-border: #dcdcde;
+	--nvs-muted: #646970;
+	--nvs-soft: #f6f7f7;
+	--nvs-blue: var(--wp-admin-theme-color, #2271b1);
+	--nvs-green: #00a32a;
+	--nvs-green-soft: #edfaef;
+	--nvs-red: #d63638;
+	--nvs-orange: #dba617;
+	--nvs-radius: 8px;
+}
+
+.nvs-admin .nvs-card {
+	background: #fff;
+	border: 1px solid var(--nvs-border);
+	border-radius: var(--nvs-radius);
+	padding: 18px 20px;
+	margin: 0 0 16px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.nvs-admin .nvs-card-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.nvs-admin .nvs-card-title {
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 0 12px;
+	padding: 0;
+}
+
+.nvs-admin .nvs-optional,
+.nvs-admin .nvs-muted {
+	color: var(--nvs-muted);
+}
+
+.nvs-admin .nvs-optional {
+	font-size: 12px;
+}
+
+.nvs-admin .nvs-field-label {
+	display: block;
+	font-weight: 600;
+	margin: 0 0 6px;
+}
+
+.nvs-admin .nvs-mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* ---------- Editor layout ---------- */
+
+.nvs-columns {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 340px;
+	gap: 20px;
+	align-items: start;
+	max-width: 1240px;
+	margin-top: 16px;
+}
+
+@media (max-width: 1100px) {
+	.nvs-columns {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.nvs-side {
+	position: sticky;
+	top: 48px;
+}
+
+@media (max-width: 1100px) {
+	.nvs-side {
+		position: static;
+	}
+}
+
+.nvs-title-input {
+	width: 100%;
+	font-size: 1.4em;
+	line-height: 1.4;
+	padding: 6px 10px;
+}
+
+.nvs-note-input {
+	width: 100%;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+	font-size: 13px;
+	line-height: 1.55;
+	padding: 10px 12px;
+	resize: vertical;
+	min-height: 120px;
+}
+
+/* ---------- Drop zone and uploads ---------- */
+
+.nvs-dropzone {
+	position: relative;
+	border: 2px dashed #c3c4c7;
+	border-radius: var(--nvs-radius);
+	background: var(--nvs-soft);
+	padding: 26px 20px 18px;
+	text-align: center;
+	transition: border-color 0.15s, background-color 0.15s;
+}
+
+.nvs-dropzone.is-dragover {
+	border-color: var(--nvs-blue);
+	background: #f0f6fc;
+}
+
+.nvs-dropzone-icon.dashicons {
+	font-size: 34px;
+	width: 34px;
+	height: 34px;
+	color: var(--nvs-blue);
+}
+
+.nvs-dropzone-text {
+	font-size: 14px;
+	margin: 8px 0 6px;
+}
+
+.nvs-dropzone-button.button {
+	margin-left: 4px;
+	vertical-align: baseline;
+}
+
+.nvs-file-input {
+	display: block;
+	margin: 8px auto 0;
+}
+
+.nvs-js .nvs-file-input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+	overflow: hidden;
+	margin: 0;
+}
+
+.nvs-js .nvs-file-input:focus-visible + .nvs-limits {
+	outline: 2px solid var(--nvs-blue);
+}
+
+.nvs-limits {
+	margin: 4px 0 0;
+	font-weight: 600;
+	color: #3c434a;
+}
+
+.nvs-limits-detail {
+	margin: 2px 0 0;
+	font-size: 12px;
+	color: var(--nvs-muted);
+}
+
+.nvs-filelist {
+	list-style: none;
+	margin: 0 0 12px;
+	padding: 0;
+}
+
+.nvs-filelist--uploads {
+	margin: 12px 0 0;
+}
+
+.nvs-filelist--uploads:empty {
+	display: none;
+}
+
+.nvs-fileitem {
+	display: grid;
+	grid-template-columns: 20px minmax(0, 1fr) auto auto;
+	align-items: center;
+	gap: 4px 10px;
+	padding: 10px 12px;
+	border: 1px solid var(--nvs-border);
+	border-radius: 6px;
+	margin: 0 0 8px;
+	background: #fff;
+}
+
+.nvs-fileitem .dashicons {
+	color: var(--nvs-muted);
+}
+
+.nvs-fileitem-name {
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.nvs-fileitem-meta {
+	color: var(--nvs-muted);
+	font-size: 12px;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.nvs-fileitem.is-removed .nvs-fileitem-name,
+.nvs-fileitem.is-marked .nvs-fileitem-name {
+	text-decoration: line-through;
+	color: var(--nvs-muted);
+}
+
+.nvs-fileitem.is-error {
+	border-color: var(--nvs-red);
+	background: #fcf0f1;
+}
+
+.nvs-fileitem.is-error .nvs-fileitem-meta {
+	color: var(--nvs-red);
+	white-space: normal;
+}
+
+.nvs-fileitem.is-done .dashicons {
+	color: var(--nvs-green);
+}
+
+.nvs-progress {
+	display: block;
+	grid-column: 2 / -1;
+	height: 6px;
+	border-radius: 3px;
+	background: #f0f0f1;
+	overflow: hidden;
+}
+
+.nvs-progress-bar {
+	display: block;
+	height: 100%;
+	width: 0;
+	background: var(--nvs-blue);
+	border-radius: 3px;
+	transition: width 0.2s ease-out;
+}
+
+.nvs-fileitem.is-done .nvs-progress-bar {
+	background: var(--nvs-green);
+}
+
+.nvs-fileitem.is-done .nvs-progress {
+	display: none;
+}
+
+.nvs-remove-toggle input {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+}
+
+.nvs-remove-toggle span,
+.nvs-fileitem-cancel {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 4px;
+	color: var(--nvs-red);
+	cursor: pointer;
+	font-size: 12px;
+	border: 1px solid transparent;
+	background: none;
+	line-height: 1.8;
+}
+
+.nvs-remove-toggle span:hover,
+.nvs-fileitem-cancel:hover {
+	border-color: currentColor;
+}
+
+.nvs-remove-toggle input:focus-visible + span {
+	outline: 2px solid var(--nvs-blue);
+	outline-offset: 1px;
+}
+
+.nvs-remove-toggle input:checked + span {
+	color: var(--nvs-blue);
+}
+
+/* ---------- Side column ---------- */
+
+.nvs-choices {
+	display: grid;
+	gap: 8px;
+	margin: 0 0 4px;
+}
+
+.nvs-choice {
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+	padding: 10px 12px;
+	border: 1px solid var(--nvs-border);
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.nvs-choice:has(input:checked) {
+	border-color: var(--nvs-blue);
+	box-shadow: 0 0 0 1px var(--nvs-blue);
+	background: #f6f9fc;
+}
+
+.nvs-choice input {
+	margin-top: 2px;
+}
+
+.nvs-choice-body {
+	display: grid;
+	gap: 2px;
+}
+
+.nvs-choice-body span,
+.nvs-check-help {
+	color: var(--nvs-muted);
+	font-size: 12px;
+	line-height: 1.45;
+}
+
+.nvs-password-field {
+	margin-top: 14px;
+}
+
+.nvs-password-field[hidden] {
+	display: none;
+}
+
+.nvs-inline {
+	display: flex;
+	gap: 6px;
+}
+
+.nvs-inline input {
+	flex: 1;
+	min-width: 0;
+}
+
+.nvs-icon-button.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 8px;
+}
+
+/* Core gives button dashicons line-height 1.9 for its 38px buttons, which pushes the glyph down here. */
+.wp-core-ui .nvs-icon-button .dashicons {
+	line-height: 1;
+}
+
+.nvs-strength {
+	margin: 6px 0 0;
+	font-size: 12px;
+	color: var(--nvs-muted);
+}
+
+.nvs-strength.is-weak {
+	color: #b32d2e;
+}
+
+.nvs-select {
+	width: 100%;
+	max-width: none;
+}
+
+.nvs-expiry-date {
+	margin-top: 8px;
+}
+
+.nvs-expiry-date input {
+	width: 100%;
+}
+
+.nvs-check {
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+	margin-top: 14px;
+	cursor: pointer;
+}
+
+.nvs-check input {
+	margin-top: 2px;
+}
+
+.nvs-check > span {
+	display: grid;
+	gap: 2px;
+}
+
+.nvs-publish {
+	display: grid;
+	gap: 10px;
+}
+
+.nvs-submit.button {
+	width: 100%;
+	justify-content: center;
+	text-align: center;
+	min-height: 40px;
+	font-size: 14px;
+}
+
+.nvs-submit-status {
+	margin: 0;
+	font-size: 12px;
+	color: var(--nvs-muted);
+	text-align: center;
+}
+
+.nvs-submit-status:empty {
+	display: none;
+}
+
+.nvs-submit-status.is-error {
+	color: var(--nvs-red);
+}
+
+.nvs-delete {
+	color: var(--nvs-red);
+	text-align: center;
+	font-size: 13px;
+}
+
+.nvs-delete:hover,
+.nvs-delete:focus {
+	color: #a00;
+}
+
+/* ---------- Link panel ---------- */
+
+.nvs-linkpanel {
+	max-width: 1240px;
+	box-sizing: border-box;
+	background: #fff;
+	border: 1px solid var(--nvs-border);
+	border-left: 4px solid var(--nvs-blue);
+	border-radius: var(--nvs-radius);
+	padding: 16px 20px;
+	margin: 16px 0 0;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.nvs-linkpanel.is-created {
+	border-left-color: var(--nvs-green);
+	background: linear-gradient(0deg, #fff, var(--nvs-green-soft));
+}
+
+.nvs-linkpanel.is-inactive {
+	border-left-color: #8c8f94;
+}
+
+.nvs-linkpanel-head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 6px;
+}
+
+.nvs-linkpanel-head h2 {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	font-size: 15px;
+}
+
+.nvs-linkpanel.is-created .nvs-linkpanel-head h2 .dashicons {
+	color: var(--nvs-green);
+	font-size: 22px;
+	width: 22px;
+	height: 22px;
+}
+
+.nvs-linkpanel-note {
+	margin: 0 0 12px;
+	color: #3c434a;
+}
+
+.nvs-copyrow {
+	display: grid;
+	grid-template-columns: 80px minmax(0, 1fr) auto;
+	gap: 8px;
+	align-items: center;
+	margin: 0 0 8px;
+}
+
+.nvs-copyrow--plain {
+	grid-template-columns: minmax(0, 1fr) auto;
+	max-width: 760px;
+	margin-top: 8px;
+}
+
+.nvs-copyrow-label {
+	font-weight: 600;
+}
+
+.nvs-copyrow input {
+	width: 100%;
+	background: var(--nvs-soft);
+}
+
+@media (max-width: 600px) {
+	.nvs-copyrow {
+		grid-template-columns: minmax(0, 1fr) auto;
+	}
+
+	.nvs-copyrow-label {
+		grid-column: 1 / -1;
+	}
+}
+
+.nvs-linkpanel-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 14px;
+	margin: 12px 0 0;
+}
+
+.nvs-linkpanel-actions .button {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.nvs-linkpanel-actions .button .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.nvs-linkpanel-facts {
+	margin: 12px 0 0;
+	color: var(--nvs-muted);
+	font-size: 12px;
+}
+
+.nvs-error-text {
+	color: var(--nvs-red);
+}
+
+.button.is-copied,
+.button-link.is-copied {
+	color: var(--nvs-green) !important;
+	border-color: var(--nvs-green) !important;
+}
+
+.button-primary.is-copied {
+	color: #fff !important;
+	background: var(--nvs-green) !important;
+}
+
+/* ---------- Status badges and chips ---------- */
+
+.nvs-status {
+	display: inline-block;
+	padding: 2px 9px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.6;
+	white-space: nowrap;
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.nvs-status--active {
+	background: var(--nvs-green-soft);
+	color: #007017;
+}
+
+.nvs-status--opened {
+	background: #fcf9e8;
+	color: #8a6d00;
+}
+
+.nvs-status--burned,
+.nvs-status--expired {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.nvs-status--disabled {
+	background: #fcf0f1;
+	color: #b32d2e;
+}
+
+.nvs-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	white-space: nowrap;
+	margin: 0 6px 2px 0;
+}
+
+.nvs-chip .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: var(--nvs-muted);
+}
+
+.nvs-chip--burn .dashicons {
+	color: #c45200;
+}
+
+.wp-list-table .column-status {
+	width: 120px;
+}
+
+.wp-list-table .column-expires {
+	width: 130px;
+}
+
+.wp-list-table .column-created {
+	width: 150px;
+}
+
+.wp-list-table .column-activity {
+	width: 170px;
+}
+
+.wp-list-table .column-access {
+	width: 180px;
+}
+
+.wp-list-table .button-link.nvs-copy-link {
+	color: var(--nvs-blue);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+/* ---------- Empty list ---------- */
+
+.nvs-empty {
+	max-width: 620px;
+	margin: 40px auto;
+	text-align: center;
+	background: #fff;
+	border: 1px solid var(--nvs-border);
+	border-radius: 12px;
+	padding: 40px 32px 28px;
+}
+
+.nvs-empty > .dashicons {
+	font-size: 44px;
+	width: 44px;
+	height: 44px;
+	color: var(--nvs-blue);
+}
+
+.nvs-empty h2 {
+	font-size: 20px;
+	margin: 12px 0 8px;
+}
+
+.nvs-empty p {
+	font-size: 14px;
+	color: #3c434a;
+}
+
+/* ---------- Activity ---------- */
+
+.nvs-activity {
+	list-style: none;
+	margin: 0 0 8px;
+	padding: 0;
+	max-height: 320px;
+	overflow: auto;
+}
+
+.nvs-activity-item {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 7px 0;
+	border-bottom: 1px solid #f0f0f1;
+	margin: 0;
+}
+
+.nvs-activity-item time {
+	color: var(--nvs-muted);
+	white-space: nowrap;
+	font-size: 12px;
+}
+
+.nvs-activity-item--password_failed .nvs-activity-text,
+.nvs-activity-item--locked .nvs-activity-text {
+	color: #b32d2e;
+}
+
+.nvs-activity-item--burned .nvs-activity-text,
+.nvs-activity-item--expired .nvs-activity-text,
+.nvs-activity-item--purged .nvs-activity-text {
+	font-weight: 600;
+}
+
+/* ---------- Settings ---------- */
+
+.nvs-settings .nvs-card {
+	max-width: 980px;
+}
+
+.nvs-settings .form-table th {
+	width: 210px;
+}
+
+.nvs-health {
+	display: inline-block;
+	padding-left: 22px;
+	position: relative;
+}
+
+.nvs-health::before {
+	position: absolute;
+	left: 0;
+	top: 0;
+	font: normal 18px/1 dashicons;
+}
+
+.nvs-health--good::before {
+	content: "\f147";
+	color: var(--nvs-green);
+}
+
+.nvs-health--warn::before {
+	content: "\f534";
+	color: var(--nvs-orange);
+}
+
+.nvs-code {
+	background: var(--nvs-soft);
+	border: 1px solid var(--nvs-border);
+	border-radius: 4px;
+	padding: 8px 10px;
+	white-space: pre-wrap;
+	max-width: 760px;
+}

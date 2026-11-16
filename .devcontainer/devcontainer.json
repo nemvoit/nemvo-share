@@ -1,0 +1,29 @@
+{
+	"name": "Nemvo Share (WordPress)",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "wordpress",
+	"runServices": ["wordpress", "db", "mailpit"],
+	"workspaceFolder": "/workspace",
+	"overrideCommand": false,
+	"shutdownAction": "stopCompose",
+	"forwardPorts": [8070, 8075],
+	"portsAttributes": {
+		"8070": { "label": "WordPress" },
+		"8075": { "label": "Mailpit" }
+	},
+	"postStartCommand": "bash /workspace/.devcontainer/setup.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"bmewburn.vscode-intelephense-client",
+				"EditorConfig.EditorConfig"
+			],
+			"settings": {
+				"intelephense.environment.includePaths": [
+					"/var/www/html"
+				],
+				"intelephense.environment.phpVersion": "8.3.0"
+			}
+		}
+	}
+}

@@ -1,0 +1,1475 @@
+# Copyright (C) 2026 Nemvo
+# This file is distributed under the MIT.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nemvo Share 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/nemvo-share\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-04T08:58:44+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: nemvo-share\n"
+
+#. Plugin Name of the plugin
+#: nemvo-share.php
+#: includes/class-health.php:156
+#: includes/class-privacy.php:34
+msgid "Nemvo Share"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: nemvo-share.php
+msgid "https://github.com/fpoller/nemvo-share"
+msgstr ""
+
+#. Description of the plugin
+#: nemvo-share.php
+msgid "Share notes and files through secret links, with optional passwords, expiry and burn after reading. Files are encrypted on disk and never reachable directly."
+msgstr ""
+
+#. Author of the plugin
+#: nemvo-share.php
+msgid "Nemvo"
+msgstr ""
+
+#. Author URI of the plugin
+#: nemvo-share.php
+msgid "https://nemvo.eu"
+msgstr ""
+
+#: includes/admin/class-admin.php:60
+#: includes/admin/class-admin.php:61
+#: includes/admin/class-list-table.php:54
+msgid "Shares"
+msgstr ""
+
+#: includes/admin/class-admin.php:68
+msgid "All Shares"
+msgstr ""
+
+#: includes/admin/class-admin.php:69
+msgid "Add Share"
+msgstr ""
+
+#: includes/admin/class-admin.php:69
+#: includes/admin/class-editor.php:111
+#: includes/admin/class-editor.php:113
+#: includes/admin/class-list-table.php:55
+msgid "Add New Share"
+msgstr ""
+
+#: includes/admin/class-admin.php:70
+#: includes/admin/class-settings-page.php:68
+msgid "Share Settings"
+msgstr ""
+
+#: includes/admin/class-admin.php:70
+#: includes/admin/class-admin.php:225
+msgid "Settings"
+msgstr ""
+
+#: includes/admin/class-admin.php:193
+msgid "Overview"
+msgstr ""
+
+#: includes/admin/class-admin.php:194
+msgid "A share is a note, one or more files, or both, behind a secret link. Send the link to the recipient; if the share has a password, send the password another way, for example by text message."
+msgstr ""
+
+#: includes/admin/class-admin.php:195
+msgid "Links look like your-site/share/… and open inside a normal page of your site, so they use your theme. Search engines are told not to index them, and they are never cached."
+msgstr ""
+
+#: includes/admin/class-admin.php:201
+#: includes/admin/class-editor.php:290
+#: includes/admin/class-list-table.php:307
+#: includes/admin/class-settings-page.php:145
+#: includes/admin/class-settings-page.php:174
+msgid "Burn after reading"
+msgstr ""
+
+#: includes/admin/class-admin.php:202
+msgid "A share with burn after reading can be opened by one person, once. The recipient first sees an Open button, so link previews in chat and email apps do not use it up. After opening, that browser can read the note and download the files for the time set in the settings. The share is destroyed as soon as every file has been downloaded, or when that time is up. A share with only a note is destroyed the moment it is shown."
+msgstr ""
+
+#: includes/admin/class-admin.php:203
+msgid "Use Preview to look at a share yourself without opening it."
+msgstr ""
+
+#: includes/admin/class-admin.php:209
+#: includes/class-health.php:61
+msgid "Security"
+msgstr ""
+
+#: includes/admin/class-admin.php:210
+msgid "Files are encrypted on disk with a key per file, stored under random names in a folder the web server refuses to serve, and only handed out through the share page. Notes, links and passwords are encrypted in the database. Wrong passwords are limited to 5 per 15 minutes per visitor."
+msgstr ""
+
+#: includes/admin/class-admin.php:213
+msgid "More"
+msgstr ""
+
+#: includes/admin/class-admin.php:213
+msgid "Documentation on GitHub"
+msgstr ""
+
+#: includes/admin/class-admin.php:226
+msgid "Add share"
+msgstr ""
+
+#: includes/admin/class-admin.php:240
+#: includes/admin/class-settings-page.php:75
+#: includes/class-health.php:188
+msgid "Share page"
+msgstr ""
+
+#: includes/admin/class-admin.php:258
+msgid "Share updated."
+msgstr ""
+
+#: includes/admin/class-admin.php:259
+msgid "Share deleted, with its files."
+msgstr ""
+
+#. translators: %d: number of shares.
+#: includes/admin/class-admin.php:261
+#, php-format
+msgid "%d share deleted."
+msgid_plural "%d shares deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/admin/class-admin.php:262
+msgid "Share switched off. The link shows that the share is not available."
+msgstr ""
+
+#: includes/admin/class-admin.php:263
+msgid "Share switched on again."
+msgstr ""
+
+#: includes/admin/class-admin.php:264
+msgid "The share has a new link. The old link no longer works."
+msgstr ""
+
+#: includes/admin/class-admin.php:265
+#: assets/js/admin.js:638
+msgid "Add a note or at least one file."
+msgstr ""
+
+#: includes/admin/class-admin.php:266
+msgid "The expiry date must be in the future."
+msgstr ""
+
+#: includes/admin/class-admin.php:267
+msgid "The share could not be saved."
+msgstr ""
+
+#: includes/admin/class-admin.php:268
+msgid "The share was saved, but some files could not be stored. Please add them again."
+msgstr ""
+
+#: includes/admin/class-admin.php:269
+msgid "The share page has been created."
+msgstr ""
+
+#: includes/admin/class-admin.php:270
+msgid "Storage protection checked again."
+msgstr ""
+
+#: includes/admin/class-admin.php:271
+msgid "That share does not exist any more."
+msgstr ""
+
+#: includes/admin/class-admin.php:272
+msgid "The contents of this share have been removed, so it can not be switched on again."
+msgstr ""
+
+#: includes/admin/class-admin.php:281
+msgid "Secret links open on the share page, which is missing, unpublished or in the trash. Links do not work until there is one."
+msgstr ""
+
+#: includes/admin/class-admin.php:283
+#: includes/admin/class-settings-page.php:105
+msgid "Create the share page"
+msgstr ""
+
+#: includes/admin/class-admin.php:293
+msgid "Sorry, you are not allowed to manage shares."
+msgstr ""
+
+#: includes/admin/class-editor.php:32
+#: includes/admin/class-list-table.php:166
+msgid "Active"
+msgstr ""
+
+#: includes/admin/class-editor.php:33
+#: includes/admin/class-editor.php:68
+#: includes/admin/class-list-table.php:167
+msgid "Expired"
+msgstr ""
+
+#: includes/admin/class-editor.php:34
+#: includes/admin/class-list-table.php:168
+msgid "Burned"
+msgstr ""
+
+#: includes/admin/class-editor.php:35
+#: includes/admin/class-editor.php:72
+#: includes/admin/class-list-table.php:169
+msgid "Switched off"
+msgstr ""
+
+#: includes/admin/class-editor.php:41
+msgid "Opened, burning"
+msgstr ""
+
+#: includes/admin/class-editor.php:54
+#: includes/admin/class-list-table.php:137
+msgid "Created"
+msgstr ""
+
+#: includes/admin/class-editor.php:55
+msgid "Changed"
+msgstr ""
+
+#: includes/admin/class-editor.php:56
+msgid "Viewed"
+msgstr ""
+
+#: includes/admin/class-editor.php:57
+msgid "Right password entered"
+msgstr ""
+
+#: includes/admin/class-editor.php:58
+msgid "Wrong password entered"
+msgstr ""
+
+#: includes/admin/class-editor.php:59
+msgid "Password being checked"
+msgstr ""
+
+#: includes/admin/class-editor.php:60
+msgid "Password attempts paused after too many wrong passwords"
+msgstr ""
+
+#: includes/admin/class-editor.php:61
+msgid "Opened (burn after reading started)"
+msgstr ""
+
+#. translators: %s: file name.
+#: includes/admin/class-editor.php:63
+#, php-format
+msgid "Downloaded %s"
+msgstr ""
+
+#. translators: %s: file name.
+#: includes/admin/class-editor.php:65
+#, php-format
+msgid "Added %s"
+msgstr ""
+
+#. translators: %s: file name.
+#: includes/admin/class-editor.php:67
+#, php-format
+msgid "Removed %s"
+msgstr ""
+
+#: includes/admin/class-editor.php:69
+msgid "Burned after reading"
+msgstr ""
+
+#: includes/admin/class-editor.php:70
+msgid "Contents deleted from the server"
+msgstr ""
+
+#: includes/admin/class-editor.php:71
+msgid "New link made, old link stopped working"
+msgstr ""
+
+#: includes/admin/class-editor.php:73
+msgid "Switched on"
+msgstr ""
+
+#: includes/admin/class-editor.php:91
+#: includes/class-frontend.php:533
+msgid "Share not found"
+msgstr ""
+
+#: includes/admin/class-editor.php:91
+msgid "Back to all shares"
+msgstr ""
+
+#: includes/admin/class-editor.php:111
+msgid "Edit Share"
+msgstr ""
+
+#: includes/admin/class-editor.php:130
+#: includes/admin/class-list-table.php:131
+msgid "Title"
+msgstr ""
+
+#: includes/admin/class-editor.php:131
+msgid "For example: Signed contract for Acme"
+msgstr ""
+
+#: includes/admin/class-editor.php:132
+msgid "Shown to anyone with the link, also before the password is entered. Leave out anything secret."
+msgstr ""
+
+#: includes/admin/class-editor.php:137
+#: includes/admin/class-list-table.php:282
+#: templates/share.php:103
+#: templates/share.php:107
+msgid "Note"
+msgstr ""
+
+#: includes/admin/class-editor.php:138
+#: includes/admin/class-editor.php:147
+msgid "Optional"
+msgstr ""
+
+#: includes/admin/class-editor.php:140
+msgid "Text, credentials, instructions…"
+msgstr ""
+
+#: includes/admin/class-editor.php:141
+msgid "Plain text, shown exactly as written with a copy button. Stored encrypted."
+msgstr ""
+
+#: includes/admin/class-editor.php:146
+#: templates/share.php:119
+msgid "Files"
+msgstr ""
+
+#: includes/admin/class-editor.php:159
+msgid "deleted from the server"
+msgstr ""
+
+#. translators: %s: number of downloads.
+#: includes/admin/class-editor.php:162
+#: includes/admin/class-editor.php:428
+#: includes/admin/class-list-table.php:357
+#, php-format
+msgid "%s download"
+msgid_plural "%s downloads"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/admin/class-editor.php:168
+#: assets/js/admin.js:255
+#: assets/js/admin.js:327
+msgid "Remove"
+msgstr ""
+
+#: includes/admin/class-editor.php:180
+msgid "Drop files here or"
+msgstr ""
+
+#: includes/admin/class-editor.php:181
+msgid "Choose files"
+msgstr ""
+
+#. translators: %s: size such as "2 GB".
+#: includes/admin/class-editor.php:189
+#, php-format
+msgid "Up to %s per file"
+msgstr ""
+
+#: includes/admin/class-editor.php:191
+msgid "No size limit per file"
+msgstr ""
+
+#. translators: %s: size such as "40 GB".
+#: includes/admin/class-editor.php:195
+#, php-format
+msgid "%s free on the server"
+msgstr ""
+
+#: includes/admin/class-editor.php:197
+msgid "any file type"
+msgstr ""
+
+#. translators: 1: chunk size, 2: PHP upload limit.
+#: includes/admin/class-editor.php:205
+#, php-format
+msgid "Files are sent in pieces of %1$s, so the server's upload limit of %2$s per request does not apply. Without JavaScript, that limit applies."
+msgstr ""
+
+#: includes/admin/class-editor.php:223
+#: includes/admin/class-editor.php:225
+#: includes/admin/class-settings-page.php:116
+#: includes/admin/class-settings-page.php:119
+msgid "Who can open it"
+msgstr ""
+
+#: includes/admin/class-editor.php:229
+#: includes/admin/class-settings-page.php:121
+msgid "Anyone with the link"
+msgstr ""
+
+#: includes/admin/class-editor.php:230
+msgid "The link alone opens the share."
+msgstr ""
+
+#: includes/admin/class-editor.php:236
+msgid "Link and password"
+msgstr ""
+
+#: includes/admin/class-editor.php:237
+msgid "Send the password another way, for example by text message."
+msgstr ""
+
+#: includes/admin/class-editor.php:242
+#: includes/admin/class-editor.php:398
+#: includes/admin/class-list-table.php:304
+#: templates/share.php:73
+msgid "Password"
+msgstr ""
+
+#: includes/admin/class-editor.php:244
+msgid "Generated when left empty"
+msgstr ""
+
+#: includes/admin/class-editor.php:245
+#: includes/admin/class-editor.php:246
+msgid "Generate a new password"
+msgstr ""
+
+#: includes/admin/class-editor.php:248
+#: includes/admin/class-editor.php:249
+#: includes/admin/class-editor.php:400
+msgid "Copy password"
+msgstr ""
+
+#: includes/admin/class-editor.php:257
+#: includes/admin/class-settings-page.php:126
+msgid "Available for"
+msgstr ""
+
+#. translators: %s: date and time.
+#: includes/admin/class-editor.php:264
+#, php-format
+msgid "Keep: until %s"
+msgstr ""
+
+#. translators: %s: date and time.
+#: includes/admin/class-editor.php:264
+#, php-format
+msgid "Keep: ended %s"
+msgstr ""
+
+#: includes/admin/class-editor.php:266
+msgid "Keep: no expiry"
+msgstr ""
+
+#. translators: %s: duration such as "7 days".
+#: includes/admin/class-editor.php:275
+#, php-format
+msgid "%s from now"
+msgstr ""
+
+#: includes/admin/class-editor.php:281
+msgid "Expiry date and time"
+msgstr ""
+
+#. translators: %s: time zone name.
+#: includes/admin/class-editor.php:284
+#, php-format
+msgid "Time zone: %s"
+msgstr ""
+
+#. translators: %d: minutes.
+#: includes/admin/class-editor.php:295
+#, php-format
+msgid "Can be opened once. The recipient then has %d minutes to read the note and download the files; after every file has been downloaded it is destroyed."
+msgstr ""
+
+#: includes/admin/class-editor.php:305
+msgid "Delete contents when it ends"
+msgstr ""
+
+#: includes/admin/class-editor.php:306
+msgid "Files and note are deleted from the server when the share expires or is burned. Otherwise they are kept, so you can extend the share."
+msgstr ""
+
+#: includes/admin/class-editor.php:312
+#: includes/admin/class-settings-page.php:147
+msgid "Email me when it is opened"
+msgstr ""
+
+#. translators: %s: email address.
+#: includes/admin/class-editor.php:317
+#, php-format
+msgid "Sent to %s the first time the share is opened."
+msgstr ""
+
+#: includes/admin/class-editor.php:327
+msgid "Create share"
+msgstr ""
+
+#: includes/admin/class-editor.php:327
+msgid "Save changes"
+msgstr ""
+
+#: includes/admin/class-editor.php:331
+msgid "The contents of this share have been deleted from the server, so it can no longer be changed. The record stays for your overview."
+msgstr ""
+
+#: includes/admin/class-editor.php:334
+#: includes/admin/class-list-table.php:267
+msgid "Delete this share and its files? The link stops working."
+msgstr ""
+
+#: includes/admin/class-editor.php:334
+msgid "Delete share"
+msgstr ""
+
+#: includes/admin/class-editor.php:359
+msgid "Your share is ready"
+msgstr ""
+
+#: includes/admin/class-editor.php:361
+msgid "Secret link"
+msgstr ""
+
+#: includes/admin/class-editor.php:370
+msgid "This share has expired. Choose a new expiry below and save to make the link work again."
+msgstr ""
+
+#: includes/admin/class-editor.php:372
+msgid "This share was opened and burned after reading. The link no longer works."
+msgstr ""
+
+#: includes/admin/class-editor.php:374
+msgid "This share is switched off. The link shows that it is not available."
+msgstr ""
+
+#: includes/admin/class-editor.php:382
+msgid "Send the link to the recipient, and the password another way, for example by text message or phone."
+msgstr ""
+
+#: includes/admin/class-editor.php:383
+msgid "Send the link to the recipient. Anyone with the link can open the share, so send it only to them."
+msgstr ""
+
+#: includes/admin/class-editor.php:389
+msgid "The link can not be shown because the encryption key changed. Make a new link to share it again."
+msgstr ""
+
+#: includes/admin/class-editor.php:392
+msgid "Link"
+msgstr ""
+
+#: includes/admin/class-editor.php:394
+#: includes/admin/class-list-table.php:256
+msgid "Copy link"
+msgstr ""
+
+#: includes/admin/class-editor.php:405
+#: includes/admin/class-list-table.php:257
+msgid "Preview"
+msgstr ""
+
+#: includes/admin/class-editor.php:410
+msgid "Email link"
+msgstr ""
+
+#: includes/admin/class-editor.php:411
+#: includes/admin/class-list-table.php:195
+#: includes/admin/class-list-table.php:260
+msgid "Switch off"
+msgstr ""
+
+#: includes/admin/class-editor.php:413
+#: includes/admin/class-list-table.php:262
+msgid "Switch on"
+msgstr ""
+
+#: includes/admin/class-editor.php:415
+msgid "Reopen this share? The link works again and it can be opened once more."
+msgstr ""
+
+#: includes/admin/class-editor.php:415
+msgid "Reopen"
+msgstr ""
+
+#: includes/admin/class-editor.php:418
+msgid "Make a new link? The current link stops working straight away."
+msgstr ""
+
+#: includes/admin/class-editor.php:418
+msgid "Make a new link"
+msgstr ""
+
+#. translators: %s: number of views.
+#: includes/admin/class-editor.php:426
+#: includes/admin/class-list-table.php:355
+#, php-format
+msgid "%s view"
+msgid_plural "%s views"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: relative time.
+#: includes/admin/class-editor.php:431
+#, php-format
+msgid "last opened %s"
+msgstr ""
+
+#. translators: %s: time.
+#: includes/admin/class-editor.php:435
+#, php-format
+msgid "burns at %s at the latest"
+msgstr ""
+
+#: includes/admin/class-editor.php:452
+msgid "Activity"
+msgstr ""
+
+#: includes/admin/class-editor.php:454
+msgid "Nothing yet."
+msgstr ""
+
+#: includes/admin/class-editor.php:465
+msgid "Who opened a share is not recorded, only when."
+msgstr ""
+
+#: includes/admin/class-list-table.php:61
+msgid "Share notes and files through secret links"
+msgstr ""
+
+#: includes/admin/class-list-table.php:62
+msgid "Add a note, files or both, choose who can open it and for how long, and send the link. Files are encrypted on the server and can only be downloaded through the link."
+msgstr ""
+
+#: includes/admin/class-list-table.php:63
+msgid "Create your first share"
+msgstr ""
+
+#: includes/admin/class-list-table.php:75
+msgid "Search shares"
+msgstr ""
+
+#: includes/admin/class-list-table.php:132
+msgid "Contents"
+msgstr ""
+
+#: includes/admin/class-list-table.php:133
+msgid "Access"
+msgstr ""
+
+#: includes/admin/class-list-table.php:134
+msgid "Status"
+msgstr ""
+
+#: includes/admin/class-list-table.php:135
+msgid "Expires"
+msgstr ""
+
+#: includes/admin/class-list-table.php:136
+msgid "Opened"
+msgstr ""
+
+#: includes/admin/class-list-table.php:165
+msgid "All"
+msgstr ""
+
+#: includes/admin/class-list-table.php:196
+#: includes/admin/class-list-table.php:268
+msgid "Delete"
+msgstr ""
+
+#: includes/admin/class-list-table.php:208
+msgid "Select bulk action"
+msgstr ""
+
+#: includes/admin/class-list-table.php:210
+msgid "Bulk actions"
+msgstr ""
+
+#: includes/admin/class-list-table.php:216
+msgid "Apply"
+msgstr ""
+
+#: includes/admin/class-list-table.php:223
+msgid "No shares found."
+msgstr ""
+
+#. translators: %s: share title.
+#: includes/admin/class-list-table.php:237
+#, php-format
+msgid "Select %s"
+msgstr ""
+
+#: includes/admin/class-list-table.php:248
+msgid "(no title)"
+msgstr ""
+
+#: includes/admin/class-list-table.php:253
+msgid "Edit"
+msgstr ""
+
+#. translators: 1: number of files, 2: total size such as "4 MB".
+#: includes/admin/class-list-table.php:288
+#: includes/class-frontend.php:657
+#, php-format
+msgid "%1$d file, %2$s"
+msgid_plural "%1$d files, %2$s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/admin/class-list-table.php:291
+msgid "Contents removed"
+msgstr ""
+
+#: includes/admin/class-list-table.php:293
+msgid "Empty"
+msgstr ""
+
+#: includes/admin/class-list-table.php:305
+msgid "Link only"
+msgstr ""
+
+#. translators: %s: relative time such as "2 hours ago".
+#: includes/admin/class-list-table.php:332
+#, php-format
+msgid "Ended %s"
+msgstr ""
+
+#: includes/admin/class-list-table.php:336
+#: includes/class-settings.php:59
+msgid "Never"
+msgstr ""
+
+#: includes/admin/class-list-table.php:349
+msgid "Not yet"
+msgstr ""
+
+#. translators: %s: relative time such as "2 hours ago".
+#: includes/admin/class-list-table.php:362
+#, php-format
+msgid "Last opened %s"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:76
+msgid "Secret links open inside this page, so they look like the rest of your site. Edit the page to add text around the share, or pick another page that contains the \"Shared notes and files\" block."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:79
+msgid "Page"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:87
+msgid "— Select —"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:94
+msgid "Edit page"
+msgstr ""
+
+#. translators: %s: example URL.
+#: includes/admin/class-settings-page.php:98
+#, php-format
+msgid "Links look like %s"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:102
+msgid "Your site uses plain permalinks, so links contain ?page_id=…. Choose another structure under Settings > Permalinks for /share/… links."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:113
+msgid "New shares start with"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:120
+msgid "Link and a generated password"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:141
+#: includes/admin/class-settings-page.php:144
+msgid "Options"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:146
+msgid "Delete contents from the server when the share ends"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:155
+msgid "Limits"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:158
+msgid "Largest file"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:160
+msgid "MB"
+msgstr ""
+
+#. translators: 1: chunk size, 2: PHP upload limit.
+#: includes/admin/class-settings-page.php:165
+#, php-format
+msgid "0 means no limit. Uploads are sent in pieces of %1$s, so PHP's upload limit (%2$s per request) does not restrict the file size."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:176
+msgid "minutes"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:177
+msgid "How long the person who opened a burn-after-reading share can download its files. It is destroyed earlier once every file has been downloaded."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:181
+msgid "Password remembered for"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:183
+msgid "hours"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:184
+msgid "After the right password, the recipient's browser can open the share without it for this long."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:188
+msgid "Keep ended shares"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:190
+msgid "days"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:191
+msgid "Expired and burned shares are deleted completely this many days after they ended. 0 keeps them until you delete them."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:198
+msgid "Appearance"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:201
+msgid "Button colour"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:204
+msgid "Leave empty to use your theme's colours. The share page otherwise follows your theme's fonts, colours and button style."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:211
+msgid "When the plugin is deleted"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:212
+msgid "Also delete all shares, their files and these settings"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:219
+msgid "Storage and encryption"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:222
+msgid "Direct access"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:226
+msgid "Blocked: the web server refuses direct requests for shared files."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:227
+msgid "Blocked: the storage folder is outside the website."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:228
+msgid "Not blocked by the web server (probably nginx, which ignores .htaccess). Files stay unreadable because they are encrypted and have random names, but add a deny rule:"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:229
+msgid "Could not be checked: WordPress could not make a request to itself."
+msgstr ""
+
+#. translators: %s: relative time.
+#: includes/admin/class-settings-page.php:240
+#, php-format
+msgid "Checked %s."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:242
+msgid "Check again"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:247
+msgid "Folder"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:250
+msgid "To keep files outside the website, define NEMVO_SHARE_STORAGE in wp-config.php with a writable folder (move existing files there yourself)."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:254
+msgid "Space"
+msgstr ""
+
+#. translators: %s: size.
+#: includes/admin/class-settings-page.php:258
+#, php-format
+msgid "%s used by shared files"
+msgstr ""
+
+#. translators: %s: size.
+#: includes/admin/class-settings-page.php:261
+#, php-format
+msgid "%s free"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:267
+#: includes/class-health.php:180
+msgid "Encryption key"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:270
+msgid "In wp-config.php (NEMVO_SHARE_KEY). Shares created since then can not be decrypted from a copy of the database alone."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:272
+msgid "Stored in the database. For better protection, add this line to wp-config.php:"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:275
+#: templates/share.php:111
+msgid "Copy"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:277
+msgid "New shares then use this key. Existing shares stay readable with the key in the database, so they keep that weaker protection until they are deleted. Keep a copy of the line: shares made with it can not be opened without it."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:282
+msgid "Encryption: XChaCha20-Poly1305 with the PHP sodium extension."
+msgstr ""
+
+#: includes/admin/class-settings-page.php:283
+msgid "Encryption: XChaCha20-Poly1305 with sodium_compat. Large files encrypt faster with the PHP sodium extension."
+msgstr ""
+
+#: includes/class-frontend.php:93
+msgid "Share"
+msgstr ""
+
+#: includes/class-frontend.php:312
+msgid "This page was open for a long time. Please try again."
+msgstr ""
+
+#: includes/class-frontend.php:333
+#: includes/class-frontend.php:392
+msgid "Too many wrong passwords. Please wait 15 minutes and try again."
+msgstr ""
+
+#: includes/class-frontend.php:408
+msgid "That password is not right. Please check it and try again."
+msgstr ""
+
+#: includes/class-frontend.php:460
+msgid "This file is no longer available."
+msgstr ""
+
+#: includes/class-frontend.php:534
+msgid "This share has expired"
+msgstr ""
+
+#: includes/class-frontend.php:535
+msgid "This share is gone"
+msgstr ""
+
+#: includes/class-frontend.php:536
+msgid "This share has already been opened"
+msgstr ""
+
+#: includes/class-frontend.php:537
+msgid "This share is not available"
+msgstr ""
+
+#: includes/class-frontend.php:540
+msgid "This link does not lead to a share. Check that you copied the whole link, or ask the sender for a new one."
+msgstr ""
+
+#: includes/class-frontend.php:541
+msgid "The time for opening this share has run out. Ask the sender to share it again if you still need it."
+msgstr ""
+
+#: includes/class-frontend.php:542
+msgid "It could only be opened once and has been destroyed after reading. Ask the sender to share it again if you still need it."
+msgstr ""
+
+#: includes/class-frontend.php:543
+msgid "It could only be opened once, and that has happened. If it was not you, let the sender know."
+msgstr ""
+
+#: includes/class-frontend.php:544
+msgid "The sender has switched this share off."
+msgstr ""
+
+#: includes/class-frontend.php:571
+msgid "Shared with you"
+msgstr ""
+
+#. translators: 1: date and time, 2: relative time such as "in 3 days".
+#: includes/class-frontend.php:623
+#, php-format
+msgid "Available until %1$s (%2$s)"
+msgstr ""
+
+#: includes/class-frontend.php:628
+msgid "No expiry date"
+msgstr ""
+
+#. translators: %s: time, such as 15:42.
+#: includes/class-frontend.php:636
+#, php-format
+msgid "Burn after reading: destroyed once every file has been downloaded, or at %s at the latest"
+msgstr ""
+
+#: includes/class-frontend.php:640
+msgid "Burn after reading: can be opened only once"
+msgstr ""
+
+#: includes/class-frontend.php:650
+msgid "Password protected"
+msgstr ""
+
+#: includes/class-frontend.php:663
+msgid "Deleted from the server when the share ends"
+msgstr ""
+
+#: includes/class-health.php:33
+#: includes/class-health.php:81
+msgid "Shared files are protected"
+msgstr ""
+
+#: includes/class-health.php:37
+#: includes/class-health.php:119
+msgid "The share page works"
+msgstr ""
+
+#: includes/class-health.php:41
+msgid "Share encryption key"
+msgstr ""
+
+#: includes/class-health.php:65
+msgid "Share settings"
+msgstr ""
+
+#: includes/class-health.php:82
+msgid "The web server refuses direct requests for shared files. They are only handed out through the share page, after its checks."
+msgstr ""
+
+#: includes/class-health.php:89
+msgid "The web server would serve shared files directly"
+msgstr ""
+
+#: includes/class-health.php:90
+msgid "The storage folder does not refuse web requests, which usually means the server is nginx (it ignores .htaccess files). Files are encrypted and have random names, so they stay unreadable, but you should block the folder too."
+msgstr ""
+
+#: includes/class-health.php:97
+msgid "Could not check whether shared files are protected"
+msgstr ""
+
+#: includes/class-health.php:98
+msgid "WordPress could not make a test request to itself, or the storage folder is not writable. Check the storage section of the share settings."
+msgstr ""
+
+#: includes/class-health.php:112
+msgid "The share page is missing"
+msgstr ""
+
+#: includes/class-health.php:113
+msgid "Secret links open on a published page with the share block. That page is missing, unpublished or in the trash, so links do not work."
+msgstr ""
+
+#. translators: %s: URL.
+#: includes/class-health.php:121
+#, php-format
+msgid "Secret links open under %s."
+msgstr ""
+
+#: includes/class-health.php:135
+msgid "The share encryption key is in wp-config.php"
+msgstr ""
+
+#: includes/class-health.php:136
+msgid "Shares created since the key was added can not be read from a copy of the database alone."
+msgstr ""
+
+#: includes/class-health.php:142
+msgid "Keep the share encryption key in wp-config.php"
+msgstr ""
+
+#: includes/class-health.php:143
+msgid "Shared notes and files are encrypted with a key stored in the database. Defining NEMVO_SHARE_KEY in wp-config.php means a leaked database backup alone can not decrypt them. The settings page has a key ready to copy."
+msgstr ""
+
+#: includes/class-health.php:159
+msgid "Version"
+msgstr ""
+
+#: includes/class-health.php:163
+msgid "Storage folder"
+msgstr ""
+
+#: includes/class-health.php:168
+msgid "Space used by shared files"
+msgstr ""
+
+#: includes/class-health.php:172
+msgid "Free disk space"
+msgstr ""
+
+#: includes/class-health.php:173
+msgid "Unknown"
+msgstr ""
+
+#: includes/class-health.php:176
+msgid "Upload chunk size"
+msgstr ""
+
+#: includes/class-health.php:181
+msgid "Database"
+msgstr ""
+
+#: includes/class-health.php:184
+msgid "Encryption library"
+msgstr ""
+
+#: includes/class-health.php:189
+msgid "Missing"
+msgstr ""
+
+#. translators: 1: date, 2: time.
+#: includes/class-plugin.php:93
+#, php-format
+msgctxt "date and time"
+msgid "%1$s %2$s"
+msgstr ""
+
+#: includes/class-plugin.php:104
+msgid "just now"
+msgstr ""
+
+#. translators: %s: a time span such as "3 days".
+#: includes/class-plugin.php:108
+#, php-format
+msgid "in %s"
+msgstr ""
+
+#. translators: %s: a time span such as "3 days".
+#: includes/class-plugin.php:108
+#, php-format
+msgid "%s ago"
+msgstr ""
+
+#: includes/class-privacy.php:31
+msgid "Nemvo Share stores no personal data about the people who open shared links. You may want to mention the cookie below."
+msgstr ""
+
+#: includes/class-privacy.php:32
+msgid "Suggested text:"
+msgstr ""
+
+#: includes/class-privacy.php:33
+msgid "When you open a shared note or file with a password, or open a share that can be read only once, we set a cookie that lets your browser see that share for a limited time. It contains no personal data and is removed when it expires. We count how often a share is opened and downloaded, without recording who opened it. To limit wrong password attempts, a one-way hash of your IP address is kept for 15 minutes."
+msgstr ""
+
+#: includes/class-settings.php:55
+msgid "1 hour"
+msgstr ""
+
+#: includes/class-settings.php:56
+msgid "1 day"
+msgstr ""
+
+#: includes/class-settings.php:57
+msgid "7 days"
+msgstr ""
+
+#: includes/class-settings.php:58
+msgid "30 days"
+msgstr ""
+
+#: includes/class-settings.php:60
+msgid "Pick a date…"
+msgstr ""
+
+#. translators: 1: site name, 2: share title.
+#: includes/class-shares.php:557
+#, php-format
+msgid "[%1$s] \"%2$s\" was opened"
+msgstr ""
+
+#. translators: %s: share title.
+#: includes/class-shares.php:560
+#, php-format
+msgid "Your share \"%s\" was just opened for the first time."
+msgstr ""
+
+#. translators: %s: date and time.
+#: includes/class-shares.php:563
+#, php-format
+msgid "Opened: %s"
+msgstr ""
+
+#. translators: %s: URL.
+#: includes/class-shares.php:565
+#, php-format
+msgid "Details: %s"
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/class-storage.php:394
+#, php-format
+msgid "HTTP %d"
+msgstr ""
+
+#. translators: %s: size such as "2 GB".
+#: includes/class-uploads.php:147
+#, php-format
+msgid "This file is larger than the limit of %s."
+msgstr ""
+
+#: includes/class-uploads.php:150
+#: includes/class-uploads.php:171
+#: includes/class-uploads.php:202
+#: includes/class-uploads.php:256
+msgid "The storage folder is not writable."
+msgstr ""
+
+#: includes/class-uploads.php:154
+#: assets/js/admin.js:314
+msgid "There is not enough free disk space on the server for this file."
+msgstr ""
+
+#: includes/class-uploads.php:195
+#: includes/class-uploads.php:222
+msgid "This upload was not found. Please try again."
+msgstr ""
+
+#: includes/class-uploads.php:235
+msgid "A piece of the file arrived out of order. Please try again."
+msgstr ""
+
+#: includes/class-uploads.php:241
+msgid "A piece of the file did not arrive. Please try again."
+msgstr ""
+
+#: includes/class-uploads.php:247
+msgid "A piece of the file arrived incomplete. Please try again."
+msgstr ""
+
+#: includes/class-uploads.php:252
+msgid "The encryption key for this upload is missing."
+msgstr ""
+
+#: templates/share.php:26
+msgid "Shared notes and files open on this page. Use the full link you received to see what was shared with you."
+msgstr ""
+
+#: templates/share.php:43
+msgid "Preview: this is what recipients see once they have opened the share. Previewing does not count as opening it."
+msgstr ""
+
+#: templates/share.php:69
+msgid "This share is protected with a password. The sender should have given it to you separately."
+msgstr ""
+
+#: templates/share.php:71
+msgid "It can be opened only once: the right password opens it straight away, and nobody can open it after you."
+msgstr ""
+
+#: templates/share.php:76
+msgid "Hide"
+msgstr ""
+
+#: templates/share.php:76
+msgid "Show"
+msgstr ""
+
+#: templates/share.php:81
+#: templates/share.php:93
+msgid "Open share"
+msgstr ""
+
+#: templates/share.php:81
+msgid "Unlock"
+msgstr ""
+
+#: templates/share.php:87
+msgid "This share can be opened only once. Open it when you are ready to read and save what is inside: nobody can open it after you."
+msgstr ""
+
+#: templates/share.php:89
+msgid "You are signed in as an administrator. Opening the share here uses it up; use Preview in wp-admin to look without opening it."
+msgstr ""
+
+#: templates/share.php:99
+msgid "This note has now been destroyed on the server. Copy what you need before you leave or reload this page."
+msgstr ""
+
+#: templates/share.php:109
+msgid "Copied"
+msgstr ""
+
+#: templates/share.php:130
+msgid "Download"
+msgstr ""
+
+#: templates/share.php:133
+msgid "Removed"
+msgstr ""
+
+#: templates/share.php:141
+msgid "This share is empty."
+msgstr ""
+
+#. translators: %d: seconds.
+#: assets/js/admin.js:58
+#, js-format
+msgid "%d s left"
+msgstr ""
+
+#. translators: %d: minutes.
+#: assets/js/admin.js:62
+#, js-format
+msgid "%d min left"
+msgstr ""
+
+#. translators: %s: hours.
+#: assets/js/admin.js:65
+#, js-format
+msgid "%s h left"
+msgstr ""
+
+#: assets/js/admin.js:113
+msgid "Copied!"
+msgstr ""
+
+#: assets/js/admin.js:195
+msgid "Short passwords are easy to guess. Use the generate button for a strong one."
+msgstr ""
+
+#: assets/js/admin.js:255
+msgid "Keep"
+msgstr ""
+
+#. translators: %s: size limit.
+#: assets/js/admin.js:312
+#, js-format
+msgid "Larger than the limit of %s per file."
+msgstr ""
+
+#. translators: %s: file name.
+#: assets/js/admin.js:330
+#, js-format
+msgid "Remove %s"
+msgstr ""
+
+#. translators: %s: file name.
+#: assets/js/admin.js:339
+#, js-format
+msgid "Uploading %s"
+msgstr ""
+
+#: assets/js/admin.js:348
+msgid "Waiting…"
+msgstr ""
+
+#. translators: 1: uploaded size, 2: total size.
+#: assets/js/admin.js:358
+#, js-format
+msgid "%1$s of %2$s"
+msgstr ""
+
+#: assets/js/admin.js:389
+msgid "Uploaded"
+msgstr ""
+
+#: assets/js/admin.js:455
+msgid "The server refused a piece of the file as too large."
+msgstr ""
+
+#: assets/js/admin.js:458
+msgid "The connection was lost."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: assets/js/admin.js:461
+#, js-format
+msgid "The upload failed (error %d)."
+msgstr ""
+
+#: assets/js/admin.js:480
+msgid "Starting…"
+msgstr ""
+
+#: assets/js/admin.js:552
+msgid "Connection problem, trying again…"
+msgstr ""
+
+#. translators: %d: percentage.
+#: assets/js/admin.js:575
+#, js-format
+msgid "Uploading… %d%%"
+msgstr ""
+
+#: assets/js/admin.js:576
+msgid "The share can be saved when the uploads are finished."
+msgstr ""
+
+#: assets/js/admin.js:648
+msgid "Pick the date and time when the share should expire."
+msgstr ""
+
+#: assets/js/admin.js:655
+msgid "Saving…"
+msgstr ""
+
+#: blocks/share/index.js:20
+msgid "Shared notes and files"
+msgstr ""
+
+#: blocks/share/index.js:24
+msgid "When someone opens a secret link, the share appears here: its title, note, download buttons and settings. Add any text you like around it."
+msgstr ""
+
+#: blocks/share/block.json
+msgctxt "block title"
+msgid "Shared notes and files"
+msgstr ""
+
+#: blocks/share/block.json
+msgctxt "block description"
+msgid "Shows a share opened through a secret link: its title, note, files and settings. Belongs on the share page."
+msgstr ""
+
+#: blocks/share/block.json
+msgctxt "block keyword"
+msgid "share"
+msgstr ""
+
+#: blocks/share/block.json
+msgctxt "block keyword"
+msgid "secret"
+msgstr ""
+
+#: blocks/share/block.json
+msgctxt "block keyword"
+msgid "download"
+msgstr ""
+
+#: blocks/share/block.json
+msgctxt "block keyword"
+msgid "note"
+msgstr ""

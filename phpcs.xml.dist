@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<ruleset name="Nemvo Share">
+	<description>WordPress Coding Standards for Nemvo Share.</description>
+	<file>./nemvo-share</file>
+	<arg name="extensions" value="php"/>
+	<config name="testVersion" value="7.4-"/>
+	<config name="minimum_supported_wp_version" value="6.2"/>
+	<rule ref="WordPress"/>
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array" value="nemvo-share"/>
+		</properties>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array" value="nemvo_share,NemvoShare,NEMVO_SHARE"/>
+		</properties>
+	</rule>
+</ruleset>

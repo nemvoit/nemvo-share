@@ -1,0 +1,400 @@
+/* Nemvo Share – the share page.
+ *
+ * The share sits inside your theme's page and takes its font, text colour and spacing.
+ * Borders and tints are mixed from the text colour, so light and dark themes both work.
+ *
+ * Restyle with plain rules on .nvs-share (no !important needed), for example:
+ *   .nvs-share { --nvs-accent: #0a7d48; --nvs-radius: 4px; }
+ *
+ * Tokens:
+ *   --nvs-accent      Button colour. Default: the theme's primary colour, then its
+ *                     contrast colour, then a neutral dark grey.
+ *   --nvs-on-accent   Button text colour. Default: black or white, whichever reads better.
+ *   --nvs-radius      Corner radius of boxes.
+ *   --nvs-border      Border colour.
+ *   --nvs-soft        Background tint of boxes.
+ *   --nvs-muted       Secondary text colour.
+ *   --nvs-warn        Colour of the burn-after-reading notice.
+ *   --nvs-danger      Colour of errors.
+ *   --nvs-note-font   Font of the note (default: monospace, so 0/O and l/1 differ).
+ */
+
+:where(.nvs-share) {
+	--nvs-accent: var(--wp--preset--color--primary, var(--accent, var(--wp--preset--color--contrast, #1f2937)));
+	--nvs-on-accent: #fff;
+	--nvs-radius: 10px;
+	--nvs-border: rgba(128, 128, 128, 0.32);
+	--nvs-soft: rgba(128, 128, 128, 0.08);
+	--nvs-muted: inherit;
+	--nvs-warn: #b45309;
+	--nvs-danger: #c02626;
+	--nvs-note-font: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+@supports (color: color-mix(in srgb, red 50%, transparent)) {
+	:where(.nvs-share) {
+		--nvs-border: color-mix(in srgb, currentColor 18%, transparent);
+		--nvs-soft: color-mix(in srgb, currentColor 4.5%, transparent);
+		--nvs-muted: color-mix(in srgb, currentColor 70%, transparent);
+	}
+}
+
+/* Black or white button text, whichever contrasts with the accent. */
+@supports (color: lch(from red l c h)) {
+	:where(.nvs-share) {
+		--nvs-on-accent: lch(from var(--nvs-accent) calc((62 - l) * 1000) 0 0);
+	}
+}
+
+.nvs-share {
+	container-type: inline-size;
+	margin-block: 0 1.5em;
+	overflow-wrap: anywhere;
+}
+
+.nvs-share *,
+.nvs-share *::before,
+.nvs-share *::after {
+	box-sizing: border-box;
+}
+
+.nvs-share .nvs-icon {
+	flex: none;
+	width: 1.15em;
+	height: 1.15em;
+	vertical-align: -0.2em;
+}
+
+:where(.nvs-share) .nvs-title {
+	margin: 0 0 0.5em;
+}
+
+/* ---------- Settings of the share ---------- */
+
+.nvs-share .nvs-facts {
+	list-style: none;
+	margin: 0 0 1.5em;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45em 1.4em;
+	font-size: 0.875em;
+	color: var(--nvs-muted);
+}
+
+.nvs-share .nvs-fact {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 0.45em;
+	margin: 0;
+	line-height: 1.45;
+}
+
+.nvs-share .nvs-fact--flame {
+	color: var(--nvs-warn);
+}
+
+/* ---------- Messages ---------- */
+
+.nvs-share .nvs-lead {
+	margin: 0 0 1em;
+}
+
+.nvs-share .nvs-warning,
+.nvs-share .nvs-error,
+.nvs-share .nvs-preview,
+.nvs-share .nvs-hint {
+	display: flex;
+	gap: 0.6em;
+	align-items: flex-start;
+	margin: 0 0 1.25em;
+	padding: 0.75em 1em;
+	border-radius: var(--nvs-radius);
+	font-size: 0.925em;
+	line-height: 1.5;
+}
+
+.nvs-share .nvs-warning {
+	border-inline-start: 3px solid var(--nvs-warn);
+	background: var(--nvs-soft);
+}
+
+.nvs-share .nvs-error {
+	border-inline-start: 3px solid var(--nvs-danger);
+	background: var(--nvs-soft);
+	color: var(--nvs-danger);
+}
+
+.nvs-share .nvs-hint {
+	background: var(--nvs-soft);
+	color: var(--nvs-muted);
+}
+
+.nvs-share .nvs-preview {
+	border: 1px dashed var(--nvs-border);
+	color: var(--nvs-muted);
+}
+
+.nvs-share .nvs-message {
+	display: grid;
+	justify-items: start;
+	gap: 0.25em;
+	padding: 1.5em;
+	border: 1px solid var(--nvs-border);
+	border-radius: var(--nvs-radius);
+	background: var(--nvs-soft);
+}
+
+.nvs-share .nvs-message .nvs-icon {
+	width: 2em;
+	height: 2em;
+	color: var(--nvs-muted);
+	margin-bottom: 0.4em;
+}
+
+.nvs-share .nvs-message p {
+	margin: 0;
+	color: var(--nvs-muted);
+}
+
+.nvs-share .nvs-message .nvs-title {
+	margin: 0 0 0.25em;
+	font-size: 1.25em;
+}
+
+/* ---------- Note ---------- */
+
+.nvs-share .nvs-note {
+	margin: 0 0 1.5em;
+	border: 1px solid var(--nvs-border);
+	border-radius: var(--nvs-radius);
+	background: var(--nvs-soft);
+	overflow: hidden;
+}
+
+.nvs-share .nvs-note-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1em;
+	padding: 0.5em 0.6em 0.5em 1em;
+	border-bottom: 1px solid var(--nvs-border);
+	font-size: 0.85em;
+}
+
+.nvs-share .nvs-note-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45em;
+	font-weight: 600;
+	color: var(--nvs-muted);
+}
+
+.nvs-share .nvs-note-text {
+	margin: 0;
+	padding: 1em;
+	font-family: var(--nvs-note-font);
+	font-size: 0.925em;
+	line-height: 1.6;
+	white-space: pre-wrap;
+	word-break: break-word;
+	tab-size: 4;
+}
+
+.nvs-share .nvs-copy,
+.nvs-share .nvs-reveal {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+	margin: 0;
+	padding: 0.3em 0.7em;
+	border: 1px solid var(--nvs-border);
+	border-radius: 999px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 0.95em;
+	line-height: 1.4;
+	cursor: pointer;
+	text-transform: none;
+	letter-spacing: normal;
+	box-shadow: none;
+}
+
+.nvs-share .nvs-copy:is(:hover, :focus-visible),
+.nvs-share .nvs-reveal:is(:hover, :focus-visible) {
+	background: var(--nvs-soft);
+	color: inherit;
+	border-color: currentColor;
+}
+
+.nvs-share .nvs-copy.is-copied {
+	color: inherit;
+	border-color: currentColor;
+}
+
+.nvs-share .nvs-copy .nvs-icon {
+	width: 1em;
+	height: 1em;
+}
+
+/* ---------- Files ---------- */
+
+.nvs-share .nvs-files {
+	list-style: none;
+	margin: 0 0 1.5em;
+	padding: 0;
+	display: grid;
+	gap: 0.6em;
+}
+
+.nvs-share .nvs-file {
+	display: flex;
+	align-items: center;
+	gap: 0.85em;
+	margin: 0;
+	padding: 0.75em 0.75em 0.75em 1em;
+	border: 1px solid var(--nvs-border);
+	border-radius: var(--nvs-radius);
+}
+
+.nvs-share .nvs-file > .nvs-icon {
+	width: 1.6em;
+	height: 1.6em;
+	color: var(--nvs-muted);
+}
+
+.nvs-share .nvs-file-info {
+	display: grid;
+	flex: 1;
+	min-width: 0;
+	line-height: 1.35;
+}
+
+.nvs-share .nvs-file-name {
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.nvs-share .nvs-file-size {
+	font-size: 0.85em;
+	color: var(--nvs-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.nvs-share .nvs-unavailable {
+	font-size: 0.875em;
+	color: var(--nvs-muted);
+}
+
+@container (max-width: 420px) {
+	.nvs-share .nvs-file {
+		flex-wrap: wrap;
+	}
+
+	.nvs-share .nvs-file-name {
+		white-space: normal;
+	}
+
+	.nvs-share .nvs-file .nvs-download {
+		flex: 1 1 100%;
+		justify-content: center;
+	}
+}
+
+/* ---------- Buttons ---------- */
+
+/* Shape defaults have no specificity, so a theme's own button style (.wp-element-button) wins. */
+:where(.nvs-share .nvs-button) {
+	padding: 0.65em 1.25em;
+	border: 0;
+	border-radius: 6px;
+	font-family: inherit;
+	font-size: 0.95em;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.nvs-share .nvs-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	flex: none;
+	background: var(--nvs-accent);
+	color: var(--nvs-on-accent);
+	text-decoration: none;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.nvs-share .nvs-button:is(:hover, :focus, :active, :visited) {
+	background: var(--nvs-accent);
+	color: var(--nvs-on-accent);
+	text-decoration: none;
+}
+
+.nvs-share .nvs-button:hover {
+	filter: brightness(1.12);
+}
+
+.nvs-share :is(a, button, input):focus-visible {
+	outline: 2px solid var(--nvs-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- Password form ---------- */
+
+.nvs-share .nvs-form {
+	max-width: 28rem;
+	margin: 0;
+}
+
+.nvs-share .nvs-label {
+	display: block;
+	font-weight: 600;
+	margin: 0 0 0.35em;
+}
+
+.nvs-share .nvs-password {
+	display: flex;
+	gap: 0.5em;
+	align-items: stretch;
+	margin: 0 0 1em;
+}
+
+:where(.nvs-share .nvs-input) {
+	padding: 0.6em 0.75em;
+	border: 1px solid var(--nvs-border);
+	border-radius: 6px;
+	font: inherit;
+	background: transparent;
+	color: inherit;
+}
+
+.nvs-share .nvs-input {
+	flex: 1;
+	min-width: 0;
+	width: 100%;
+	margin: 0;
+}
+
+.nvs-share .nvs-reveal {
+	border-radius: 6px;
+	padding-inline: 0.9em;
+}
+
+.screen-reader-text:where(.nvs-share *) {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal;
+}
