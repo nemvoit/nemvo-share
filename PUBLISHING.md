@@ -47,6 +47,8 @@ Reviewers often ask about the following. The answers are already in `readme.txt`
 | `flush_rewrite_rules()` | Only on activation and once after the share page changes (an option flag; plus a check at most once a day that the rules exist). Deactivation deletes the stored rules instead of flushing. |
 | Unsanitized note and password input | Notes are encrypted and always escaped on output; they keep `<` and `>` so code and passwords survive. Passwords are hashed and compared exactly as typed. Both are explained in comments next to the code (`Admin::sanitize_note()`, `Frontend::unlock()`). |
 | Direct file operations (`fopen`, `fwrite`) | Files are streamed and encrypted block by block, which WP_Filesystem can't do. Annotated in `class-storage.php` and `class-uploads.php`. |
+| What it adds to the directory (file sharing is a crowded category) | Self-hosted: no file-sharing service in between and no external requests. Files encrypted at rest with a key per file (XChaCha20-Poly1305), notes and passwords encrypted in the database, optional key outside the database (`NEMVO_SHARE_KEY`). Burn after reading that link previews in chat and email apps can't trigger (an Open button; downloads count only when complete). Chunked uploads past PHP's upload limit. The share page uses the site's own theme. |
+| Limits on input | Titles at most 200 characters (`Shares::TITLE_MAX`), file names 200, MIME types 150; expiry dates must be real dates in the future (`Admin::expiry_from_local()`); upload size within the configured maximum and free disk space, chunks in order and of the exact size; burn window, unlock time and record retention clamped to fixed ranges (`Settings::sanitize()`); five password attempts per visitor per 15 minutes; activity capped at 200 entries per share. |
 
 ## 4. After approval
 
@@ -62,13 +64,14 @@ The release workflow (`.github/workflows/release.yml`) already contains a WordPr
 2. **Settings → Secrets and variables → Actions → Variables:** add `WPORG_DEPLOY` with the value `true`.
 3. Push the tag of the approved version (`git tag -a v<version> -m "Nemvo Share <version>" && git push origin v<version>`), or, if it was already pushed, open its run under **Actions → Release** and choose **Re-run all jobs**.
 
-The job copies `nemvo-share/` to `trunk/`, creates `tags/<version>` and uploads `.wordpress-org/` (icons, banners, screenshots) to `assets/`.
+The job builds the release zip, copies its contents to `trunk/` (so WordPress.org gets exactly the files in the zip), creates `tags/<version>` and uploads `.wordpress-org/` (icons, banners, screenshots) to `assets/`. Once `WPORG_DEPLOY` is on, **every pushed tag is a public WordPress.org release**.
 
 ### Option B: by hand with SVN
 
 ```sh
+unzip -q dist/nemvo-share-<version>.zip -d build
 svn checkout https://plugins.svn.wordpress.org/nemvo-share wporg && cd wporg
-rsync -a --delete ../nemvo-share/ trunk/
+rsync -a --delete ../build/nemvo-share/ trunk/
 mkdir -p assets && cp ../.wordpress-org/* assets/
 svn add --force trunk assets
 svn cp trunk tags/<version>

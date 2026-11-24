@@ -25,6 +25,11 @@ class Shares {
 	const LOG_LIMIT = 200;
 
 	/**
+	 * Longest title, in characters (the editor's limit; the column holds 255).
+	 */
+	const TITLE_MAX = 200;
+
+	/**
 	 * One share.
 	 *
 	 * @param int $id Share ID.
@@ -92,7 +97,7 @@ class Shares {
 			array(
 				'token_hash'    => Crypto::token_hash( $token ),
 				'token_enc'     => Crypto::encrypt( $token, 'token' ),
-				'title'         => isset( $data['title'] ) ? (string) $data['title'] : '',
+				'title'         => self::clean_title( isset( $data['title'] ) ? $data['title'] : '' ),
 				'note_enc'      => Crypto::encrypt( $note, 'note' ),
 				'has_note'      => '' !== trim( $note ) ? 1 : 0,
 				'password_hash' => '' !== $password ? wp_hash_password( $password ) : '',
@@ -126,7 +131,7 @@ class Shares {
 		$row = array( 'updated_at' => Plugin::now() );
 		foreach ( array( 'title', 'burn', 'auto_delete', 'notify' ) as $key ) {
 			if ( array_key_exists( $key, $data ) ) {
-				$row[ $key ] = 'title' === $key ? (string) $data[ $key ] : ( empty( $data[ $key ] ) ? 0 : 1 );
+				$row[ $key ] = 'title' === $key ? self::clean_title( $data[ $key ] ) : ( empty( $data[ $key ] ) ? 0 : 1 );
 			}
 		}
 		if ( array_key_exists( 'expires_at', $data ) ) {
@@ -342,6 +347,18 @@ class Shares {
 		Storage::delete( $file->stored );
 		$wpdb->delete( Install::table( 'files' ), array( 'id' => $file->id ) );
 		self::log( $share_id, 'file_removed', $file->name );
+	}
+
+	/**
+	 * A share title cut to the editor's limit, which also holds for requests that bypass the
+	 * form and for WP-CLI. wpdb refuses a whole row when one value is longer than its column,
+	 * so an over-long title would otherwise lose every change of that save.
+	 *
+	 * @param mixed $title Title, already sanitized as text.
+	 * @return string
+	 */
+	public static function clean_title( $title ) {
+		return trim( mb_substr( (string) $title, 0, self::TITLE_MAX ) );
 	}
 
 	/**
@@ -685,7 +702,7 @@ class Shares {
 		$search    = ! empty( $args['search'] ) ? '%' . $wpdb->esc_like( (string) $args['search'] ) . '%' : '';
 		$orderable = array( 'title', 'created_at', 'expires_at', 'views', 'downloads', 'status' );
 		$orderby   = in_array( $args['orderby'] ?? '', $orderable, true ) ? $args['orderby'] : 'created_at';
-		$per_page  = max( 1, (int) ( $args['per_page'] ?? 20 ) );
+		$per_page  = min( 1000, max( 1, (int) ( $args['per_page'] ?? 20 ) ) );
 		$offset    = max( 0, ( (int) ( $args['page'] ?? 1 ) - 1 ) * $per_page );
 
 		$total = (int) $wpdb->get_var(

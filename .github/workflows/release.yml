@@ -44,11 +44,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Deploy exactly what the zip holds, the same files WordPress.org reviewed.
+      - name: Build and unpack the zip
+        run: |
+          ./build.sh
+          mkdir build && unzip -q "dist/nemvo-share-${{ needs.github.outputs.version }}.zip" -d build
       - uses: 10up/action-wordpress-plugin-deploy@stable
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: nemvo-share
           VERSION: ${{ needs.github.outputs.version }}
-          BUILD_DIR: nemvo-share
+          BUILD_DIR: build/nemvo-share
           ASSETS_DIR: .wordpress-org

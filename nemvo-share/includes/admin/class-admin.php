@@ -276,6 +276,7 @@ class Admin {
 			'link'        => array( 'success', __( 'The share has a new link. The old link no longer works.', 'nemvo-share' ) ),
 			'empty'       => array( 'error', __( 'Add a note or at least one file.', 'nemvo-share' ) ),
 			'past'        => array( 'error', __( 'The expiry date must be in the future.', 'nemvo-share' ) ),
+			'baddate'     => array( 'error', __( 'Enter a valid expiry date and time.', 'nemvo-share' ) ),
 			'failed'      => array( 'error', __( 'The share could not be saved.', 'nemvo-share' ) ),
 			'files'       => array( 'warning', __( 'The share was saved, but some files could not be stored. Please add them again.', 'nemvo-share' ) ),
 			'page'        => array( 'success', __( 'The share page has been created.', 'nemvo-share' ) ),
@@ -345,9 +346,12 @@ class Admin {
 			$expires = null;
 		} elseif ( 'custom' === $expiry ) {
 			$local = isset( $_POST['expiry_date'] ) ? sanitize_text_field( wp_unslash( $_POST['expiry_date'] ) ) : '';
-			$local = str_replace( 'T', ' ', $local );
-			$utc   = preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/', $local ) ? get_gmt_from_date( $local ) : '';
-			if ( ! $utc || \NemvoShare\Plugin::ts( $utc ) <= time() ) {
+			$utc   = self::expiry_from_local( $local );
+			if ( '' === $utc ) {
+				wp_safe_redirect( add_query_arg( 'nemvo_share_msg', 'baddate', $back ) );
+				exit;
+			}
+			if ( Plugin::ts( $utc ) <= time() ) {
 				wp_safe_redirect( add_query_arg( 'nemvo_share_msg', 'past', $back ) );
 				exit;
 			}
@@ -421,6 +425,27 @@ class Admin {
 		}
 		wp_safe_redirect( self::edit_url( $id, $args ) );
 		exit;
+	}
+
+	/**
+	 * The expiry date from the editor (local time, as the date picker sends it) in UTC.
+	 * Only real calendar dates and times are accepted, so a crafted value such as
+	 * 31 February isn't silently moved to March.
+	 *
+	 * @param string $local Date like 2026-12-24T18:00 or 2026-12-24 18:00:00.
+	 * @return string UTC datetime, or '' when the value isn't a valid date and time.
+	 */
+	public static function expiry_from_local( $local ) {
+		$local = str_replace( 'T', ' ', trim( (string) $local ) );
+		if ( ! preg_match( '/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?$/', $local, $m ) ) {
+			return '';
+		}
+		$second = isset( $m[6] ) ? (int) $m[6] : 0;
+		if ( (int) $m[1] < 1970 || ! checkdate( (int) $m[2], (int) $m[3], (int) $m[1] ) || (int) $m[4] > 23 || (int) $m[5] > 59 || $second > 59 ) {
+			return '';
+		}
+		$utc = get_gmt_from_date( $local );
+		return is_string( $utc ) && preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $utc ) ? $utc : '';
 	}
 
 	/**

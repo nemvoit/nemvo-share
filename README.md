@@ -150,13 +150,21 @@ docker compose -f .devcontainer/docker-compose.yml exec wordpress bash /workspac
 cd tests/e2e && npm install && npm test   # real Chrome: create a share with chunked uploads, unlock, download, burn
 node tests/e2e/assets.mjs                 # regenerate .wordpress-org/ screenshots and icons
 ./build.sh                                # dist/nemvo-share-<version>.zip
-./smoke-test.sh dist/nemvo-share-1.0.1.zip # clean WordPress, flows over HTTP, Plugin Check, PHP 7.4 lint, uninstall
+./smoke-test.sh dist/nemvo-share-1.0.2.zip # clean WordPress, flows over HTTP, Plugin Check, PHP 7.4 lint, uninstall
 phpcs --standard=phpcs.xml.dist            # WordPress Coding Standards 3 + PHPCompatibilityWP, as in CI
 ```
 
 See [PUBLISHING.md](PUBLISHING.md) for releases and WordPress.org.
 
 ## Changelog
+
+### 1.0.2
+
+- Titles are cut to `Shares::TITLE_MAX` (200 characters, the editor's `maxlength`) in `Shares::create()` and `Shares::update()`, so requests that bypass the form and WP-CLI can't exceed the 255-character column: `wpdb` refuses the whole row then, so creating failed and an update silently dropped every change of that save.
+- The editor's custom expiry goes through `Admin::expiry_from_local()`: only real dates (`checkdate()`, from 1970) and times; anything else gets the new "Enter a valid expiry date and time." notice (`nemvo_share_msg=baddate`) instead of being moved to another day.
+- `wp nemvo-share create --expires=` refuses dates in the past and dates WordPress can't store (more than four-digit years).
+- `Shares::query()` returns at most 1,000 rows per page.
+- The release workflow's WordPress.org job deploys the unpacked release zip instead of the `nemvo-share/` folder.
 
 ### 1.0.1
 

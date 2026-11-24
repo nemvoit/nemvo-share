@@ -209,8 +209,13 @@ class CLI {
 			return Plugin::now( $seconds );
 		}
 		$utc = get_gmt_from_date( $value );
-		if ( ! $utc || '0000-00-00 00:00:00' === $utc ) {
+		// Four-digit years only: the database can't store later dates. WordPress answers an
+		// unreadable date with the Unix epoch.
+		if ( ! is_string( $utc ) || ! preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $utc ) || in_array( $utc, array( '0000-00-00 00:00:00', '1970-01-01 00:00:00' ), true ) ) {
 			\WP_CLI::error( sprintf( 'Unknown expiry: %s', $value ) );
+		}
+		if ( Plugin::ts( $utc ) <= time() ) {
+			\WP_CLI::error( sprintf( 'The expiry must be in the future: %s', $value ) );
 		}
 		return $utc;
 	}

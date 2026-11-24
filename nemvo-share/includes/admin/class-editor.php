@@ -128,7 +128,7 @@ class Editor {
 
 						<div class="nvs-card">
 							<label class="nvs-field-label" for="nvs-title"><?php esc_html_e( 'Title', 'nemvo-share' ); ?></label>
-							<input type="text" id="nvs-title" name="title" class="nvs-title-input" maxlength="200" value="<?php echo esc_attr( $share ? $share->title : '' ); ?>" placeholder="<?php esc_attr_e( 'For example: Signed contract for Acme', 'nemvo-share' ); ?>" <?php disabled( ! $editable ); ?>>
+							<input type="text" id="nvs-title" name="title" class="nvs-title-input" maxlength="<?php echo esc_attr( (string) Shares::TITLE_MAX ); ?>" value="<?php echo esc_attr( $share ? $share->title : '' ); ?>" placeholder="<?php esc_attr_e( 'For example: Signed contract for Acme', 'nemvo-share' ); ?>" <?php disabled( ! $editable ); ?>>
 							<p class="description"><?php esc_html_e( 'Shown as the heading of the share page. With a password, recipients see it only after entering the password; without one, anyone with the link sees it.', 'nemvo-share' ); ?></p>
 						</div>
 

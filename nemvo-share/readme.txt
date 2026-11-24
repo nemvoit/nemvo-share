@@ -4,7 +4,7 @@ Tags: file sharing, secure share, password, burn after reading, private files
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -148,6 +148,11 @@ The only outgoing request goes to the site itself: the storage check (in Setting
 
 == Changelog ==
 
+= 1.0.2 =
+* Fixed: share titles are limited to 200 characters everywhere, also when a share is saved without the editor (for example with WP-CLI). A longer title used to make the save fail.
+* Fixed: an expiry date that doesn't exist (such as 31 February) is refused with a clear message instead of being moved to another day.
+* WP-CLI: `wp nemvo-share create --expires=` refuses dates in the past.
+
 = 1.0.1 =
 * The title of a password-protected share is now hidden until the password is entered (page heading, browser title, download form); the page says "Protected share" instead.
 * Privacy: the IP hash kept with password attempts is now removed after 15 minutes, as the privacy text says; privacy text and readme corrected.
@@ -165,6 +170,9 @@ The only outgoing request goes to the site itself: the storage check (in Setting
 * First release: notes and files through secret links, with optional passwords, expiry, burn after reading and automatic deletion, encrypted storage, chunked uploads with progress, a theme-friendly share page, activity log, Site Health checks and WP-CLI commands.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Stricter checks of share titles and expiry dates.
 
 = 1.0.1 =
 Hides the title of password-protected shares until the password is entered, removes stored IP hashes after 15 minutes, and fixes saving settings with a custom capability. Requires WordPress 6.3.
